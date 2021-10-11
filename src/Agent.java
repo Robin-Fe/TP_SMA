@@ -42,22 +42,19 @@ public class Agent {
     public void perception(Environnement environment) {
         this.underAgent = environment.getNextAgent(this);
         this.isFree = environment.getIsFree(this);
+        System.out.println("IS FREEEE ?" + this.isFree);
         this.goalAchieved = underAgent == goal || goal == null;
     }
 
     public void action(Environnement environment) {
         if (isPushed || !goalAchieved) {
-            System.out.println("CCCCCCCCCCCCCCCCCCCCCC");
-
             if (this.isFree) {
-                System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
 
                 // ToDo : choose index on the table
                 int index = 1;
                 environment.seDeplacer(this, index);
                 this.isPushed = false;
             } else {
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 environment.push(this);
             }
         }

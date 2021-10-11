@@ -20,8 +20,8 @@ public class Environnement {
     public void seDeplacer(Agent agent, int indexPileArrivee) {
         Stack<Agent> pileArrivee = getPile(indexPileArrivee);
         Stack<Agent> pileDepart = getPile(getPlace(agent));
-        pileDepart.pop();
-        pileArrivee.add(agent);
+        Agent agentPop = pileDepart.pop();
+        pileArrivee.push(agentPop);
     }
 
     public Agent getNextAgent(Agent agent) {
@@ -57,6 +57,11 @@ public class Environnement {
 
     public boolean getIsFree(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
+        System.out.println("test");
+        System.out.println(getPile(getPlace(agent)).firstElement().getName());
+        System.out.println(agent.getName());
+        System.out.println(pile.firstElement() == agent);
+
         return pile.firstElement() == agent;
     }
 
@@ -77,6 +82,6 @@ public class Environnement {
     }
 
     public void addAgent(Agent agent, int indexPile) {
-        this.getPile(indexPile).add(agent);
+        this.getPile(indexPile).push(agent);
     }
 }

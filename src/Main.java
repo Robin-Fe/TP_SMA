@@ -10,10 +10,10 @@ public class Main {
         Agent B = new Agent("B", A);
         Agent C = new Agent("C", B);
         Agent D = new Agent("D", C);
+        environnement.addAgent(C, 0);
         environnement.addAgent(A, 0);
         environnement.addAgent(D, 0);
         environnement.addAgent(B, 0);
-        environnement.addAgent(C, 0);
         List<Agent> agents = Arrays.asList(A, B, C, D);
         while (!(A.getGoalAchieved() && B.getGoalAchieved() && C.getGoalAchieved() && D.getGoalAchieved())) {
             System.out.println("NOUVEAU TOUR \n");
