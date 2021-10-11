@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class Agent {
     private String name;
     private Agent goal;
@@ -38,25 +40,34 @@ public class Agent {
     }
 
 
-
     public void perception(Environnement environment) {
-        this.underAgent = environment.getNextAgent(this);
+        this.underAgent = environment.getPreviousAgent(this);
         this.isFree = environment.getIsFree(this);
-        System.out.println("IS FREEEE ?" + this.isFree);
-        this.goalAchieved = underAgent == goal || goal == null;
+        this.goalAchieved = underAgent == goal;
     }
 
     public void action(Environnement environment) {
-        if (isPushed || !goalAchieved) {
-            if (this.isFree) {
-
-                // ToDo : choose index on the table
-                int index = 1;
-                environment.seDeplacer(this, index);
-                this.isPushed = false;
+        if (!goalAchieved) {
+            tryToMove(environment);
+        } else {
+            if (isPushed) {
+                tryToMove(environment);
             } else {
-                environment.push(this);
+                System.out.println(this.getName() + " ne fait rien");
             }
+        }
+
+    }
+
+    private void tryToMove(Environnement environment) {
+        if (isFree) {
+            // ToDo : change 3 to number of piles
+            int index = new Random().nextInt(3);
+            System.out.println(this.getName() + " bouge vers " + index);
+            environment.seDeplacer(this, index);
+        } else {
+            System.out.println(this.getName() + " push");
+            environment.push(this);
         }
     }
 

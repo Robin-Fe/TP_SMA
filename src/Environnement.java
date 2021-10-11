@@ -6,18 +6,23 @@ public class Environnement {
 
     private List<Stack<Agent>> piles;
     private int nbPiles;
+    private Agent table;
 
-    public Environnement(int nbPiles) {
+    public Environnement(int nbPiles, Agent table) {
         this.nbPiles = nbPiles;
         this.piles = new ArrayList<>(3);
         for (int i = 0; i < nbPiles; i++) {
             Stack<Agent> pile = new Stack<>();
             this.piles.add(pile);
         }
+        this.table = table;
     }
 
 
     public void seDeplacer(Agent agent, int indexPileArrivee) {
+        if (indexPileArrivee != getPlace(agent)) {
+            agent.setPush(false);
+        }
         Stack<Agent> pileArrivee = getPile(indexPileArrivee);
         Stack<Agent> pileDepart = getPile(getPlace(agent));
         Agent agentPop = pileDepart.pop();
@@ -26,15 +31,18 @@ public class Environnement {
 
     public Agent getNextAgent(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
-        if (pile.size() > pile.search(agent) + 1){
-            return pile.elementAt(pile.search(agent) + 1);
-        }
-        return null;
+        int index = pile.indexOf(agent);
+        if (index == pile.size() - 1)
+            return null;
+        return pile.get(index+1);
     }
 
     public Agent getPreviousAgent(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
-        return pile.elementAt(pile.search(agent) - 1);
+        int index = pile.indexOf(agent);
+        if (index == 0)
+            return this.table;
+        return pile.get(index-1);
     }
 
     public Stack<Agent> getPile(int place) {
@@ -57,25 +65,26 @@ public class Environnement {
 
     public boolean getIsFree(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
-        System.out.println("test");
-        System.out.println(getPile(getPlace(agent)).firstElement().getName());
-        System.out.println(agent.getName());
-        System.out.println(pile.firstElement() == agent);
-
-        return pile.firstElement() == agent;
+        return pile.lastElement() == agent;
     }
 
 
     public void push(Agent agent) {
-        getPreviousAgent(agent).setPush(true);
+        if (getNextAgent(agent) != null)
+            getNextAgent(agent).setPush(true);
     }
 
     public void printEnvironment() {
-        for (int i = 0; i < piles.size(); i++) {
+        for (int i = 2; i >= 0; i--) {
             Stack<Agent> pile = piles.get(i);
-            System.out.println("\nPile " + i + "\n");
+            String string = "";
             for (Agent agent : pile) {
-                System.out.println("Agent " + agent.getName() + "\n");
+                string += agent.getName() + " ";
+            }
+            if (string != "") {
+                System.out.println(string);
+            } else {
+                System.out.println("[     ]");
             }
 
         }
