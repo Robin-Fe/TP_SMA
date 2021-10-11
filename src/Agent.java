@@ -1,57 +1,37 @@
 public class Agent {
+    public String name;
+    public Agent goal;
+    public Boolean goalAchieved;
+    public Agent underAgent;
+    public Boolean isPushed;
+    public Boolean isFree;
 
-    private int id;
-    private String name;
-    private Agent goal;
-    private Environnement environnement;
-    private boolean isPushed;
-    private boolean satisfied;
-
-    public int getId() {
-        return id;
+    public Agent(String name, Agent goal){
+        this.name = name;
+        this.goal = goal;
+        this.goalAchieved = false;
     }
 
-    public String getName() {
-        return name;
+    public void perception(Environnement environment){
+        this.underAgent = environment.getNextAgent(this);
+        this.isFree = environment.getIsFree(this);
+        this.isPushed = environment.getIsPushed(this);
+        this.goalAchieved = underAgent == goal || goal == null;
     }
 
-    public Environnement getEnvironnement() {
-        return environnement;
-    }
-
-    public boolean seDeplacer(int x) {
-        if (this.getEnvironnement().moveAgent(this, this.getEnvironnement().getPile(x))) {
-            this.notPushed();
-            return true;
+    public void action(Environnement environment){
+        if (!isFree && isPushed){
+            environment.pousser(this);
         }
-        this.getEnvironnement().getPreviousAgent(this).pushed();
-        return false;
-    }
-
-    public void pushed() {
-        isPushed = true;
-    }
-
-    public void notPushed() {
-        isPushed = false;
-    }
-
-    public void setGoal(Agent agent) {
-        this.goal = agent;
-    }
-
-    public Agent getGoal() {
-        return this.goal;
-    }
-
-    public boolean checkSatisfied() {
-        if (getGoal() == getEnvironnement().getNextAgent(this)) {
-            this.satisfied = true;
-            return true;
+        else if (isFree && !goalAchieved || isPushed && isFree){
+            // ToDo : choose index on the table
+            int index = 0;
+            environment.seDeplacer(this, index);
+            this.isPushed = false;
         }
-        this.satisfied = false;
-        return false;
+        else if (!isFree && ! goalAchieved){
+            environment.pousser(this);
+        }
     }
-
 
 }

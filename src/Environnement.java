@@ -6,6 +6,7 @@ public class Environnement {
 
     private List<Stack<Agent>> piles;
     public int nbPiles;
+    private int test;
 
     public Environnement(int nbPiles) {
         this.nbPiles = nbPiles;
@@ -27,7 +28,8 @@ public class Environnement {
             pileArrivee.add(agent);
             return true;
         }
-        getPreviousAgent(agent).pushed();
+        //ToDo check
+        // getPreviousAgent(agent).pushed();
         return false;
     }
 
@@ -57,5 +59,25 @@ public class Environnement {
         }
         return -1;
     }
+
+
+
+    public boolean getIsFree(Agent agent) {
+        // ToDo : return real agent
+        return true;
+    }
+    public boolean getIsPushed(Agent agent) {
+        // ToDo : return real agent
+        return true;
+    }
+    public void seDeplacer(Agent agent, int index) {
+        test = 0;
+    }
+
+
+    public void pousser(Agent agent) {
+        test = 0;
+    }
+
 
 }
