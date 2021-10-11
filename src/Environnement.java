@@ -5,45 +5,39 @@ import java.util.Stack;
 public class Environnement {
 
     private List<Stack<Agent>> piles;
-    public int nbPiles;
-    private int test;
+    private int nbPiles;
 
     public Environnement(int nbPiles) {
         this.nbPiles = nbPiles;
-        this.piles =  new ArrayList<>(3);
-    }
-
-    public boolean isEmpty (Stack<Agent> pile) {
-        return pile.isEmpty();
-    }
-
-    public boolean isMoveable (Agent agent, Stack<Agent> pile) {
-        return pile.firstElement() == agent;
-    }
-
-    public boolean moveAgent (Agent agent, Stack<Agent> pileArrivee) {
-        Stack<Agent> pileDepart = getPile(getPlace(agent));
-        if (isMoveable(agent, pileDepart)) {
-            pileDepart.pop();
-            pileArrivee.add(agent);
-            return true;
+        this.piles = new ArrayList<>(3);
+        for (int i = 0; i < nbPiles; i++) {
+            Stack<Agent> pile = new Stack<>();
+            this.piles.add(pile);
         }
-        //ToDo check
-        // getPreviousAgent(agent).pushed();
-        return false;
+    }
+
+
+    public void seDeplacer(Agent agent, int indexPileArrivee) {
+        Stack<Agent> pileArrivee = getPile(indexPileArrivee);
+        Stack<Agent> pileDepart = getPile(getPlace(agent));
+        pileDepart.pop();
+        pileArrivee.add(agent);
     }
 
     public Agent getNextAgent(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
-        return pile.elementAt(pile.search(agent)+1);
+        if (pile.size() > pile.search(agent) + 1){
+            return pile.elementAt(pile.search(agent) + 1);
+        }
+        return null;
     }
 
     public Agent getPreviousAgent(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
-        return pile.elementAt(pile.search(agent)-1);
+        return pile.elementAt(pile.search(agent) - 1);
     }
 
-    public Stack<Agent> getPile (int place) {
+    public Stack<Agent> getPile(int place) {
         return this.getPiles().get(place);
     }
 
@@ -51,33 +45,38 @@ public class Environnement {
         return this.piles;
     }
 
-    public int getPlace (Agent agent) {
+    public int getPlace(Agent agent) {
         for (int i = 0; i < nbPiles; i++) {
             if (getPile(i).contains(agent)) {
                 return i;
             }
         }
-        return -1;
+        return -100;
     }
-
 
 
     public boolean getIsFree(Agent agent) {
-        // ToDo : return real agent
-        return true;
-    }
-    public boolean getIsPushed(Agent agent) {
-        // ToDo : return real agent
-        return true;
-    }
-    public void seDeplacer(Agent agent, int index) {
-        test = 0;
+        Stack<Agent> pile = getPile(getPlace(agent));
+        return pile.firstElement() == agent;
     }
 
 
-    public void pousser(Agent agent) {
-        test = 0;
+    public void push(Agent agent) {
+        getPreviousAgent(agent).setPush(true);
     }
 
+    public void printEnvironment() {
+        for (int i = 0; i < piles.size(); i++) {
+            Stack<Agent> pile = piles.get(i);
+            System.out.println("\nPile " + i + "\n");
+            for (Agent agent : pile) {
+                System.out.println("Agent " + agent.getName() + "\n");
+            }
 
+        }
+    }
+
+    public void addAgent(Agent agent, int indexPile) {
+        this.getPile(indexPile).add(agent);
+    }
 }
