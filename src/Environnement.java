@@ -3,10 +3,10 @@ import java.util.List;
 import java.util.Stack;
 
 public class Environnement {
-
-    private List<Stack<Agent>> piles;
-    private int nbPiles;
-    private Agent table;
+    //ToDo : simplifier certaines méthodes
+    private final List<Stack<Agent>> piles;
+    private final int nbPiles;
+    private final Agent table;
 
     public Environnement(int nbPiles, Agent table) {
         this.nbPiles = nbPiles;
@@ -77,11 +77,11 @@ public class Environnement {
     public void printEnvironment() {
         for (int i = 2; i >= 0; i--) {
             Stack<Agent> pile = piles.get(i);
-            String string = "";
+            StringBuilder string = new StringBuilder();
             for (Agent agent : pile) {
-                string += agent.getName() + " ";
+                string.append(agent.getName()).append(" ");
             }
-            if (string != "") {
+            if (!string.toString().equals("")) {
                 System.out.println(string);
             } else {
                 System.out.println("[     ]");
