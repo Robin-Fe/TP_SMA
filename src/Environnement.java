@@ -14,7 +14,7 @@ public class Environnement {
         this.verbose = verbose;
         this.nbPiles = nbPiles;
         this.nbAgent = nbAgent;
-        this.piles = new ArrayList<>(3);
+        this.piles = new ArrayList<>(nbPiles);
         for (int i = 0; i < nbPiles; i++) {
             Stack<Agent> pile = new Stack<>();
             this.piles.add(pile);
@@ -38,7 +38,7 @@ public class Environnement {
         int index = pile.indexOf(agent);
         if (index == pile.size() - 1)
             return null;
-        return pile.get(index+1);
+        return pile.get(index + 1);
     }
 
     public Objet getPreviousAgent(Agent agent) {
@@ -46,7 +46,7 @@ public class Environnement {
         int index = pile.indexOf(agent);
         if (index == 0)
             return this.table;
-        return pile.get(index-1);
+        return pile.get(index - 1);
     }
 
     public Stack<Agent> getPile(int place) {
@@ -86,11 +86,11 @@ public class Environnement {
                 string.append(agent.getName()).append(" ");
             }
             if (!string.toString().equals("")) {
-                int nb = 2*getNbAgents()-string.length();
+                int nb = 2 * getNbAgents() - string.length();
                 string.append(" ".repeat(Math.max(0, nb)));
                 System.out.println("[ " + string + "]");
             } else {
-                string.append(" ".repeat(Math.max(0, 1+2*getNbAgents())));
+                string.append(" ".repeat(Math.max(0, 1 + 2 * getNbAgents())));
                 System.out.println("[" + string + "]");
             }
 

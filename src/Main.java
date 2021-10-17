@@ -1,7 +1,6 @@
 public class Main {
 
     public static void main(String[] args) {
-
         int score = 0;
         int nbSimulations = 10;
         for (int i = 0; i < nbSimulations; i++) {

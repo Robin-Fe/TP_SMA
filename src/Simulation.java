@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class Simulation {
 
-    private List<Agent> agents;
-    private Environnement environnement;
+    private final List<Agent> agents;
+    private final Environnement environnement;
     public boolean verbose;
 
     public Simulation(boolean verbose, boolean randomOrdering, int nbAgents) {
@@ -34,8 +34,8 @@ public class Simulation {
                 int r2 = new Random().nextInt(environnement.getNbPiles());
                 environnement.addAgent(agents.get(r1), r2);
             }
-        }
-        else {
+        } else {
+            //ToDo : add le bon nombre d'agent
             environnement.addAgent(C, 0);
             environnement.addAgent(D, 0);
             environnement.addAgent(A, 0);
@@ -45,11 +45,10 @@ public class Simulation {
         this.environnement = environnement;
     }
 
-    public int runSimulation () {
+    public int runSimulation() {
         int nbTours = 0;
-
         while (!(testFinSimulation())) {
-            nbTours ++;
+            nbTours++;
             if (verbose) {
                 System.out.println("\n");
                 environnement.printEnvironment();

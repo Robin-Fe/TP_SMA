@@ -29,8 +29,7 @@ public class Agent extends Objet {
 
     private void tryToMove(Environnement environment) {
         if (getFree()) {
-            // ToDo : change 3 to number of piles
-            // ToDo : comment l'agent choisi sa pile d'arrivee
+            // ToDo : Comment l'agent choisi sa pile d'arrivee
             int index = new Random().nextInt(environment.getNbPiles());
             if (environment.verbose) {
                 System.out.println(this.getName() + " bouge vers " + index);
