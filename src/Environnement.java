@@ -6,10 +6,14 @@ public class Environnement {
     //ToDo : simplifier certaines méthodes
     private final List<Stack<Agent>> piles;
     private final int nbPiles;
-    private final Agent table;
+    private final Objet table;
+    private final int nbAgent;
+    public boolean verbose;
 
-    public Environnement(int nbPiles, Agent table) {
+    public Environnement(int nbPiles, Objet table, int nbAgent, boolean verbose) {
+        this.verbose = verbose;
         this.nbPiles = nbPiles;
+        this.nbAgent = nbAgent;
         this.piles = new ArrayList<>(3);
         for (int i = 0; i < nbPiles; i++) {
             Stack<Agent> pile = new Stack<>();
@@ -37,7 +41,7 @@ public class Environnement {
         return pile.get(index+1);
     }
 
-    public Agent getPreviousAgent(Agent agent) {
+    public Objet getPreviousAgent(Agent agent) {
         Stack<Agent> pile = getPile(getPlace(agent));
         int index = pile.indexOf(agent);
         if (index == 0)
@@ -82,9 +86,12 @@ public class Environnement {
                 string.append(agent.getName()).append(" ");
             }
             if (!string.toString().equals("")) {
-                System.out.println(string);
+                int nb = 2*getNbAgents()-string.length();
+                string.append(" ".repeat(Math.max(0, nb)));
+                System.out.println("[ " + string + "]");
             } else {
-                System.out.println("[     ]");
+                string.append(" ".repeat(Math.max(0, 1+2*getNbAgents())));
+                System.out.println("[" + string + "]");
             }
 
         }
@@ -92,5 +99,13 @@ public class Environnement {
 
     public void addAgent(Agent agent, int indexPile) {
         this.getPile(indexPile).push(agent);
+    }
+
+    public int getNbPiles() {
+        return this.nbPiles;
+    }
+
+    public int getNbAgents() {
+        return this.nbAgent;
     }
 }
