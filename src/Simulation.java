@@ -10,17 +10,17 @@ public class Simulation {
     public boolean verbose;
     public Politique AgentElection;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentAction, Politique AgentDirection) {
+    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentAction, Politique AgentDestination) {
         this.AgentElection = AgentElection;
         this.verbose = verbose;
         //TODO : A rendre modulaire (partiellement fait)
         Objet table = new Objet("Table", null);
         Environnement environnement = new Environnement(3, table, nbAgents, verbose);
-        Agent A = new Agent("A", table, AgentAction, AgentDirection);
+        Agent A = new Agent("A", table, AgentAction, AgentDestination);
         List<Agent> agents = new ArrayList<>();
         agents.add(A);
         for (int i = 1; i < nbAgents; i++) {
-            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentAction, AgentDirection));
+            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentAction, AgentDestination));
         }
 
         if (randomOrdering) {
@@ -33,12 +33,20 @@ public class Simulation {
                 environnement.addAgent(agents.get(r1), r2);
             }
         } else {
+            int i = 0;
             for (Agent agent : agents) {
-                environnement.addAgent(agent, 0);
+                environnement.addAgent(agent, i);
+                i++;
+                if (i >= environnement.getNbPiles()) {
+                    i=0;
+                }
             }
         }
         this.agents = agents;
         this.environnement = environnement;
+        for (Agent agent : this.agents) {
+            agent.perception(this.environnement);
+        }
     }
 
     public int runSimulation() {
@@ -49,15 +57,17 @@ public class Simulation {
                 System.out.println("\n");
                 environnement.printEnvironment();
             }
-            //ToDo : Comment on choisi l'agent ?
+
+            allAgentsPerception();
             Agent agentChoisi = (Agent) AgentElection.getChoice(Collections.singletonList(agents));
-            agentChoisi.perception(environnement);
             agentChoisi.action(environnement);
-            agentChoisi.perception(environnement);
+            allAgentsPerception();
         }
-        System.out.println("\n");
-        environnement.printEnvironment();
-        System.out.println("\nNb Tours = " + nbTours);
+        if (verbose) {
+            System.out.println("\n");
+            environnement.printEnvironment();
+            System.out.println("\nNb Tours = " + nbTours);
+        }
         return nbTours;
     }
 
@@ -68,6 +78,12 @@ public class Simulation {
             }
         }
         return true;
+    }
+
+    public void allAgentsPerception() {
+        for (Agent agent : this.agents) {
+            agent.perception(this.environnement);
+        }
     }
 
 }

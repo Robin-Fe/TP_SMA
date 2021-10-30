@@ -1,14 +1,14 @@
-import java.util.Random;
+import java.util.Collections;
 
 public class Agent extends Objet {
 
     public Politique AgentAction;
-    public Politique AgentDirection;
+    public Politique AgentDestination;
 
-    public Agent(String name, Objet goal, Politique AgentAction, Politique AgentDirection) {
+    public Agent(String name, Objet goal, Politique AgentAction, Politique AgentDestination) {
         super(name, goal);
         this.AgentAction = AgentAction;
-        this.AgentDirection = AgentDirection;
+        this.AgentDestination = AgentDestination;
     }
 
     public void perception(Environnement environment) {
@@ -19,23 +19,22 @@ public class Agent extends Objet {
 
     public void action(Environnement environment) {
         // ToDo : Comment l'agent choisit son action ?
-        if (!getGoalAchieved()) {
+        if (!getGoalAchieved() || getPushed()) {
             tryToMove(environment);
         } else {
-            if (getPushed()) {
-                tryToMove(environment);
-            } else {
-                if (environment.verbose) {
-                    System.out.println(this.getName() + " ne fait rien");
-                }
+            if (environment.verbose) {
+                System.out.println(this.getName() + " ne fait rien");
             }
         }
     }
 
     private void tryToMove(Environnement environment) {
         if (getFree()) {
-            // ToDo : Comment l'agent choisi sa pile d'arrivee
-            int index = new Random().nextInt(environment.getNbPiles());
+            int startingIndex = environment.getPiles().lastIndexOf(environment.getPile(environment.getPlace(this)));
+            int index = startingIndex;
+            while (startingIndex == index) {
+                index = environment.getPiles().lastIndexOf(AgentDestination.getChoice(Collections.singletonList(environment.getPiles())));
+            }
             if (environment.verbose) {
                 System.out.println(this.getName() + " bouge vers " + index);
             }
