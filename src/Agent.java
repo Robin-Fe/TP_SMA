@@ -2,8 +2,13 @@ import java.util.Random;
 
 public class Agent extends Objet {
 
-    public Agent(String name, Objet goal) {
+    public Politique AgentAction;
+    public Politique AgentDirection;
+
+    public Agent(String name, Objet goal, Politique AgentAction, Politique AgentDirection) {
         super(name, goal);
+        this.AgentAction = AgentAction;
+        this.AgentDirection = AgentDirection;
     }
 
     public void perception(Environnement environment) {

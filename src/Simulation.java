@@ -1,4 +1,5 @@
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -7,24 +8,21 @@ public class Simulation {
     private final List<Agent> agents;
     private final Environnement environnement;
     public boolean verbose;
+    public Politique AgentElection;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents) {
+    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentAction, Politique AgentDirection) {
+        this.AgentElection = AgentElection;
         this.verbose = verbose;
-        //TODO : A rendre modulaire
+        //TODO : A rendre modulaire (partiellement fait)
         Objet table = new Objet("Table", null);
         Environnement environnement = new Environnement(3, table, nbAgents, verbose);
-        Agent A = new Agent("A", table);
-        Agent B = new Agent("B", A);
-        Agent C = new Agent("C", B);
-        Agent D = new Agent("D", C);
-        Agent E = new Agent("E", D);
-        Agent F = new Agent("F", E);
-        Agent G = new Agent("G", F);
-        Agent H = new Agent("H", G);
-        Agent I = new Agent("I", H);
-        Agent J = new Agent("J", I);
-        List<Agent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
-        agents = agents.subList(0, nbAgents);
+        Agent A = new Agent("A", table, AgentAction, AgentDirection);
+        List<Agent> agents = new ArrayList<>();
+        agents.add(A);
+        for (int i = 1; i < nbAgents; i++) {
+            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentAction, AgentDirection));
+        }
+
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
             for (int i = 0; i < agents.size(); i++) {
@@ -35,11 +33,9 @@ public class Simulation {
                 environnement.addAgent(agents.get(r1), r2);
             }
         } else {
-            //ToDo : add le bon nombre d'agent
-            environnement.addAgent(C, 0);
-            environnement.addAgent(D, 0);
-            environnement.addAgent(A, 0);
-            environnement.addAgent(B, 0);
+            for (Agent agent : agents) {
+                environnement.addAgent(agent, 0);
+            }
         }
         this.agents = agents;
         this.environnement = environnement;
@@ -54,7 +50,7 @@ public class Simulation {
                 environnement.printEnvironment();
             }
             //ToDo : Comment on choisi l'agent ?
-            Agent agentChoisi = choisirAgentRandom();
+            Agent agentChoisi = (Agent) AgentElection.getChoice(Collections.singletonList(agents));
             agentChoisi.perception(environnement);
             agentChoisi.action(environnement);
             agentChoisi.perception(environnement);
@@ -72,11 +68,6 @@ public class Simulation {
             }
         }
         return true;
-    }
-
-    public Agent choisirAgentRandom() {
-        int r = new Random().nextInt(agents.size());
-        return agents.get(r);
     }
 
 }
