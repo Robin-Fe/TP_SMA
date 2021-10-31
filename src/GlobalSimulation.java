@@ -2,30 +2,30 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class SmartSimulation {
+public class GlobalSimulation {
 
-    private final List<SmartAgent> agents;
+    private final List<GlobalAgent> agents;
     private final Environnement environment;
-    private final Strategy strategy;
+    private final GlobalStrategy strategy;
     public boolean verbose;
 
-    public SmartSimulation(boolean verbose, boolean randomOrdering, int nbAgents, Strategy strategy) {
+    public GlobalSimulation(boolean verbose, boolean randomOrdering, int nbAgents, GlobalStrategy strategy) {
         this.verbose = verbose;
         this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
         Environnement environment = new Environnement(3, table, nbAgents, verbose);
-        SmartAgent A = new SmartAgent("A", table, strategy);
-        SmartAgent B = new SmartAgent("B", A, strategy);
-        SmartAgent C = new SmartAgent("C", B, strategy);
-        SmartAgent D = new SmartAgent("D", C, strategy);
-        SmartAgent E = new SmartAgent("E", D, strategy);
-        SmartAgent F = new SmartAgent("F", E, strategy);
-        SmartAgent G = new SmartAgent("G", F, strategy);
-        SmartAgent H = new SmartAgent("H", G, strategy);
-        SmartAgent I = new SmartAgent("I", H, strategy);
-        SmartAgent J = new SmartAgent("J", I, strategy);
-        List<SmartAgent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
+        GlobalAgent A = new GlobalAgent("A", table, strategy);
+        GlobalAgent B = new GlobalAgent("B", A, strategy);
+        GlobalAgent C = new GlobalAgent("C", B, strategy);
+        GlobalAgent D = new GlobalAgent("D", C, strategy);
+        GlobalAgent E = new GlobalAgent("E", D, strategy);
+        GlobalAgent F = new GlobalAgent("F", E, strategy);
+        GlobalAgent G = new GlobalAgent("G", F, strategy);
+        GlobalAgent H = new GlobalAgent("H", G, strategy);
+        GlobalAgent I = new GlobalAgent("I", H, strategy);
+        GlobalAgent J = new GlobalAgent("J", I, strategy);
+        List<GlobalAgent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
         agents = agents.subList(0, nbAgents);
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
@@ -76,12 +76,12 @@ public class SmartSimulation {
         return true;
     }
 
-    public SmartAgent getClaimerAgent() {
+    public GlobalAgent getClaimerAgent() {
         return strategy.getLastClaimer(environment);
     }
 
     public void allAgentPerception(Environnement environment) {
-        for (SmartAgent agent : agents) {
+        for (GlobalAgent agent : agents) {
             agent.perception(environment);
         }
     }

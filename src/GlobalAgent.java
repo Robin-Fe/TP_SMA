@@ -1,10 +1,8 @@
-import java.util.Random;
-
-public class SmartAgent extends Agent {
-    private final Strategy strategy;
+public class GlobalAgent extends Agent {
+    private final GlobalStrategy strategy;
     private Integer destinationIndex;
 
-    public SmartAgent(String name, Objet goal, Strategy strategy) {
+    public GlobalAgent(String name, Objet goal, GlobalStrategy strategy) {
         super(name, goal);
         this.strategy = strategy;
     }
@@ -20,7 +18,7 @@ public class SmartAgent extends Agent {
                 this.strategy.addClaimer(environment, this);
             }
         } else {
-            if (getGoalAchieved() && strategy.getSleepers().contains((SmartAgent) getGoal())) {
+            if (getGoalAchieved() && strategy.getSleepers().contains((GlobalAgent) getGoal())) {
                 strategy.sleep(this);
             }
         }
@@ -28,7 +26,7 @@ public class SmartAgent extends Agent {
 
 
     public void action(Environnement environment) {
-        if (!(getGoal() instanceof SmartAgent)) {
+        if (!(getGoal() instanceof GlobalAgent)) {
             firstAgentAction(environment);
         } else {
             if (getPushed()) {
@@ -41,8 +39,6 @@ public class SmartAgent extends Agent {
                 }
             }
         }
-
-
     }
 
     public void firstAgentAction(Environnement environment) {
@@ -66,7 +62,6 @@ public class SmartAgent extends Agent {
             }
             strategy.askToBeFree(this, environment);
             environment.push(this);
-
         }
     }
 

@@ -5,7 +5,7 @@ public class Main {
         int nbSimulations = 1;
         for (int i = 0; i < nbSimulations; i++) {
             //Simulation simulation = new Simulation(false, true, 10);
-            SmartSimulation simulation = new SmartSimulation(true, true, 5, new Strategy());
+            GlobalSimulation simulation = new GlobalSimulation(true, true, 5, new GlobalStrategy());
             score += simulation.runSimulation();
         }
         System.out.println("Pour " + nbSimulations + " Simulation, score total : " + score);

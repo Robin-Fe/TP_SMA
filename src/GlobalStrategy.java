@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
-public class Strategy {
-    private Stack<SmartAgent> claimers = new Stack<>(); // Stack which shows who is gonna move
-    private Stack<SmartAgent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
+public class GlobalStrategy {
+    private Stack<GlobalAgent> claimers = new Stack<>(); // Stack which shows who is gonna move
+    private Stack<GlobalAgent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
 
-    public Strategy() {
+    public GlobalStrategy() {
     }
 
-    public void addClaimer(Environnement environment, SmartAgent agent) {
+    public void addClaimer(Environnement environment, GlobalAgent agent) {
         if (!(this.claimers.contains(agent))) {
             this.claimers.add(agent);
         }
@@ -25,13 +25,13 @@ public class Strategy {
         }
     }
 
-    public SmartAgent getLastClaimer(Environnement environnement) {
+    public GlobalAgent getLastClaimer(Environnement environnement) {
         if (this.claimers.size() == 0) {
-            SmartAgent lastSleeper = sleepers.lastElement();
+            GlobalAgent lastSleeper = sleepers.lastElement();
             for (Stack<Agent> stack : environnement.getPiles()) {
                 for (Agent agent : stack) {
                     if (agent.getGoal() == lastSleeper) {
-                        claimers.add((SmartAgent) agent);
+                        claimers.add((GlobalAgent) agent);
                     }
                 }
             }
@@ -53,7 +53,7 @@ public class Strategy {
     }
 
 
-    public void askToMove(SmartAgent agent, int objectiveIndex, Environnement environment) {
+    public void askToMove(GlobalAgent agent, int objectiveIndex, Environnement environment) {
         // Ask the other to free de destination Stack
         int usedStackIndex = environment.getPlace(agent);
         ArrayList<Integer> choices = new ArrayList<>();
@@ -72,25 +72,25 @@ public class Strategy {
                 if (environment.verbose){
                     System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
                 }
-                ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-                ((SmartAgent) oneAgent).claim(environment);
+                ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
+                ((GlobalAgent) oneAgent).claim(environment);
                 //addClaimer((SmartAgent) oneAgent);
 
             }
         }
     }
 
-    public void sleep(SmartAgent agent) {
+    public void sleep(GlobalAgent agent) {
         if (!sleepers.contains(agent)) {
             sleepers.add(agent);
         }
     }
 
-    public Stack<SmartAgent> getSleepers() {
+    public Stack<GlobalAgent> getSleepers() {
         return this.sleepers;
     }
 
-    public void askToBeFree(SmartAgent agent, Environnement environment) {
+    public void askToBeFree(GlobalAgent agent, Environnement environment) {
         // Push Everoyone at the top, and ask them to let the objective stack free
         int usedStackIndex = environment.getPlace(agent);
         int destinationStackIndex;
@@ -116,15 +116,15 @@ public class Strategy {
                 if (environment.verbose){
                     System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
                 }
-                ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-                ((SmartAgent) oneAgent).claim(environment);
+                ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
+                ((GlobalAgent) oneAgent).claim(environment);
                 //addClaimer((SmartAgent) oneAgent);
 
             }
         }
     }
 
-    public void askEmptyStack(Environnement environment, SmartAgent agent) {
+    public void askEmptyStack(Environnement environment, GlobalAgent agent) {
         int usedStackIndex = environment.getPlace(agent);
         int lowestStackIndex = environment.getLowestStack();
         ArrayList<Integer> choices = new ArrayList<>();
@@ -141,8 +141,8 @@ public class Strategy {
             if (environment.verbose){
                 System.out.println(agent.getName() + " demande à " + oneAgent.getName() + " de bouger vers " + destinationIndex);
             }
-            ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-            ((SmartAgent) oneAgent).claim(environment);
+            ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
+            ((GlobalAgent) oneAgent).claim(environment);
             //addClaimer((SmartAgent) oneAgent);
         }
     }
