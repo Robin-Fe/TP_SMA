@@ -50,7 +50,7 @@ public class SmartSimulation {
 
     public int runSimulation() {
         int nbTours = 0;
-        while (!(testFinSimulation())) {
+        while (!(testFinSimulation()) && nbTours <50) {
             nbTours++;
             if (verbose) {
                 System.out.println("\n");

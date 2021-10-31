@@ -9,17 +9,20 @@ public class Strategy {
     public Strategy() {
     }
 
-    public void addClaimer(SmartAgent agent) {
+    public void addClaimer(Environnement environment, SmartAgent agent) {
         if (!(this.claimers.contains(agent))) {
             this.claimers.add(agent);
         }
-        System.out.println("CLAIMERS : " + printClaimers());
+        if (environment.verbose) {
+            System.out.println("CLAIMERS : " + printClaimers());
+        }
     }
 
-    public void removeClaimer() {
+    public void removeClaimer(Environnement environment) {
         this.claimers.removeElementAt(claimers.size() - 1);
-        System.out.println("CLAIMERS : " + printClaimers());
-
+        if (environment.verbose) {
+            System.out.println("CLAIMERS : " + printClaimers());
+        }
     }
 
     public SmartAgent getLastClaimer(Environnement environnement) {
@@ -66,9 +69,11 @@ public class Strategy {
         Stack<Agent> destinationStack = environment.getPile(objectiveIndex);
         for (Agent oneAgent : destinationStack) {
             if (destinationStack.indexOf(oneAgent) > destinationStack.indexOf(agent) + 1) {
-                System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
+                if (environment.verbose){
+                    System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
+                }
                 ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-                ((SmartAgent) oneAgent).claim();
+                ((SmartAgent) oneAgent).claim(environment);
                 //addClaimer((SmartAgent) oneAgent);
 
             }
@@ -108,9 +113,11 @@ public class Strategy {
         }
         for (Agent oneAgent : usedStack) {
             if (usedStack.indexOf(oneAgent) > usedStack.indexOf(agent)) {
-                System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
+                if (environment.verbose){
+                    System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
+                }
                 ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-                ((SmartAgent) oneAgent).claim();
+                ((SmartAgent) oneAgent).claim(environment);
                 //addClaimer((SmartAgent) oneAgent);
 
             }
@@ -131,9 +138,11 @@ public class Strategy {
             destinationIndex = new Random().nextInt(environment.getNbPiles());
         }
         for (Agent oneAgent : environment.getPile(lowestStackIndex)) {
-            System.out.println(agent.getName() + " demande à " + oneAgent.getName() + " de bouger vers " + destinationIndex);
+            if (environment.verbose){
+                System.out.println(agent.getName() + " demande à " + oneAgent.getName() + " de bouger vers " + destinationIndex);
+            }
             ((SmartAgent) oneAgent).setPush(true, destinationIndex);
-            ((SmartAgent) oneAgent).claim();
+            ((SmartAgent) oneAgent).claim(environment);
             //addClaimer((SmartAgent) oneAgent);
         }
     }

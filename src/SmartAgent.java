@@ -17,19 +17,13 @@ public class SmartAgent extends Agent {
             if (getGoalAchieved()) {
                 this.strategy.sleep(this);
             } else {
-                this.strategy.addClaimer(this);
+                this.strategy.addClaimer(environment, this);
             }
         } else {
             if (getGoalAchieved() && strategy.getSleepers().contains((SmartAgent) getGoal())) {
                 strategy.sleep(this);
-            } else {
-                if (getPushed()) {
-//                    strategy.addClaimer(this);
-//                    System.out.println(getName() + " is pushed and has to move to " + getDestinationIndex());
-                }
             }
         }
-
     }
 
 
@@ -58,14 +52,13 @@ public class SmartAgent extends Agent {
                     System.out.println(getName() + " bouge vers " + environment.getStackFree() + " here");
                 }
                 environment.seDeplacer(this, environment.getStackFree());
-                strategy.removeClaimer();
+                strategy.removeClaimer(environment);
 
             } else {
                 if (environment.verbose) {
                     System.out.println(getName() + " demande une empty stack ");
                 }
                 strategy.askEmptyStack(environment, this);
-
             }
         } else {
             if (environment.verbose) {
@@ -82,7 +75,7 @@ public class SmartAgent extends Agent {
             System.out.println(getName() + " bouge vers " + destinationIndex + " ici");
         }
         environment.seDeplacer(this, destinationIndex);
-        strategy.removeClaimer();
+        strategy.removeClaimer(environment);
     }
 
     public void isFreeAction(Environnement environment) {
@@ -92,7 +85,7 @@ public class SmartAgent extends Agent {
                 System.out.println(getName() + " bouge vers " + destinationIndex + " la");
             }
             environment.seDeplacer(this, destinationIndex);
-            strategy.removeClaimer();
+            strategy.removeClaimer(environment);
         } else {
             if (environment.verbose) {
                 System.out.println(getName() + " demande a liberer la stack " + destinationIndex);
@@ -117,10 +110,9 @@ public class SmartAgent extends Agent {
         }
     }
 
-    public void claim(){
-        strategy.addClaimer(this);
+    public void claim(Environnement environment) {
+        strategy.addClaimer(environment, this);
     }
-
 
 
 }
