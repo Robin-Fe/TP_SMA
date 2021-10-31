@@ -10,6 +10,8 @@ public class Environnement {
     private final int nbAgent;
     public boolean verbose;
 
+
+
     public Environnement(int nbPiles, Objet table, int nbAgent, boolean verbose) {
         this.verbose = verbose;
         this.nbPiles = nbPiles;
@@ -108,4 +110,44 @@ public class Environnement {
     public int getNbAgents() {
         return this.nbAgent;
     }
+
+
+
+
+    public boolean getIsOneStackFree() {
+        boolean isOneStackFree = false;
+        for (Stack<Agent> pile : piles) {
+            if (pile.size() == 0) {
+                isOneStackFree = true;
+                break;
+            }
+        }
+        return isOneStackFree;
+    }
+
+    public int getStackFree() {
+        for (Stack<Agent> pile : piles) {
+            if (pile.size() == 0) {
+                return piles.indexOf(pile);
+            }
+        }
+        return -1;
+    }
+
+
+    public int getLowestStack(){
+        int lowestStackIndex = 0;
+        Stack<Agent> lowestStack = getPile(lowestStackIndex);
+        for (int index = 0; index < piles.size(); index++) {
+            Stack<Agent> stack = piles.get(index);
+            if (stack.size() < lowestStack.size()){
+                lowestStack = stack;
+                lowestStackIndex = index;
+            }
+
+        }
+        return lowestStackIndex;
+    }
+
+
 }

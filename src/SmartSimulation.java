@@ -2,28 +2,30 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class Simulation {
+public class SmartSimulation {
 
-    private final List<Agent> agents;
+    private final List<SmartAgent> agents;
     private final Environnement environment;
+    private final Strategy strategy;
     public boolean verbose;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents) {
+    public SmartSimulation(boolean verbose, boolean randomOrdering, int nbAgents, Strategy strategy) {
         this.verbose = verbose;
+        this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
         Environnement environment = new Environnement(3, table, nbAgents, verbose);
-        Agent A = new Agent("A", table);
-        Agent B = new Agent("B", A);
-        Agent C = new Agent("C", B);
-        Agent D = new Agent("D", C);
-        Agent E = new Agent("E", D);
-        Agent F = new Agent("F", E);
-        Agent G = new Agent("G", F);
-        Agent H = new Agent("H", G);
-        Agent I = new Agent("I", H);
-        Agent J = new Agent("J", I);
-        List<Agent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
+        SmartAgent A = new SmartAgent("A", table, strategy);
+        SmartAgent B = new SmartAgent("B", A, strategy);
+        SmartAgent C = new SmartAgent("C", B, strategy);
+        SmartAgent D = new SmartAgent("D", C, strategy);
+        SmartAgent E = new SmartAgent("E", D, strategy);
+        SmartAgent F = new SmartAgent("F", E, strategy);
+        SmartAgent G = new SmartAgent("G", F, strategy);
+        SmartAgent H = new SmartAgent("H", G, strategy);
+        SmartAgent I = new SmartAgent("I", H, strategy);
+        SmartAgent J = new SmartAgent("J", I, strategy);
+        List<SmartAgent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
         agents = agents.subList(0, nbAgents);
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
@@ -45,6 +47,7 @@ public class Simulation {
         this.environment = environment;
     }
 
+
     public int runSimulation() {
         int nbTours = 0;
         while (!(testFinSimulation())) {
@@ -53,18 +56,16 @@ public class Simulation {
                 System.out.println("\n");
                 environment.printEnvironment();
             }
-            //ToDo : Comment on choisi l'agent ?
-            Agent agentChoisi = choisirAgentRandom();
-            agentChoisi.perception(environment);
-            agentChoisi.action(environment);
-            agentChoisi.perception(environment);
+
+            allAgentPerception(environment);
+            getClaimerAgent().action(environment);
+            allAgentPerception(environment);
         }
         System.out.println("\n");
         environment.printEnvironment();
         System.out.println("\nNb Tours = " + nbTours);
         return nbTours;
     }
-
 
     public boolean testFinSimulation() {
         for (Agent agent : agents) {
@@ -75,8 +76,13 @@ public class Simulation {
         return true;
     }
 
-    public Agent choisirAgentRandom() {
-        int r = new Random().nextInt(agents.size());
-        return agents.get(r);
+    public SmartAgent getClaimerAgent() {
+        return strategy.getLastClaimer(environment);
+    }
+
+    public void allAgentPerception(Environnement environment) {
+        for (SmartAgent agent : agents) {
+            agent.perception(environment);
+        }
     }
 }
