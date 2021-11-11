@@ -81,7 +81,7 @@ public class Environnement {
     }
 
     public void printEnvironment() {
-        for (int i = 2; i >= 0; i--) {
+        for (int i = nbPiles-1; i >= 0; i--) {
             Stack<Agent> pile = piles.get(i);
             StringBuilder string = new StringBuilder();
             for (Agent agent : pile) {
@@ -95,7 +95,6 @@ public class Environnement {
                 string.append(" ".repeat(Math.max(0, 1 + 2 * getNbAgents())));
                 System.out.println("[" + string + "]");
             }
-
         }
     }
 
@@ -144,7 +143,6 @@ public class Environnement {
                 lowestStack = stack;
                 lowestStackIndex = index;
             }
-
         }
         return lowestStackIndex;
     }

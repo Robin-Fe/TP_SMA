@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 public class GlobalAgent extends Agent {
     private final GlobalStrategy strategy;
     private Integer destinationIndex;
@@ -45,7 +48,7 @@ public class GlobalAgent extends Agent {
         if (getFree()) {
             if (environment.getIsOneStackFree()) {
                 if (environment.verbose) {
-                    System.out.println(getName() + " bouge vers " + environment.getStackFree() + " here");
+                    System.out.println(getName() + " bouge vers " + environment.getStackFree());
                 }
                 environment.seDeplacer(this, environment.getStackFree());
                 strategy.removeClaimer(environment);
@@ -67,7 +70,7 @@ public class GlobalAgent extends Agent {
 
     public void isPushedAction(Environnement environment) {
         if (environment.verbose) {
-            System.out.println(getName() + " bouge vers " + destinationIndex + " ici");
+            System.out.println(getName() + " bouge vers " + destinationIndex);
         }
         environment.seDeplacer(this, destinationIndex);
         strategy.removeClaimer(environment);
@@ -75,18 +78,38 @@ public class GlobalAgent extends Agent {
 
     public void isFreeAction(Environnement environment) {
         destinationIndex = environment.getPlace((Agent) getGoal());
-        if (environment.getPile(destinationIndex).lastElement() == getGoal()) {
+        int agentIndex = environment.getPlace(this);
+        if (agentIndex == destinationIndex){
+            ArrayList<Integer> choices = new ArrayList<>();
+            for (int i = 0; i <= environment.getNbPiles() - 1; i++) {
+                choices.add(i);
+            }
+            choices.remove((Object)agentIndex);
+            int destinationIndex = new Random().nextInt(environment.getNbPiles());
+            while (!choices.contains(destinationIndex)) {
+                destinationIndex = new Random().nextInt(environment.getNbPiles());
+            }
             if (environment.verbose) {
-                System.out.println(getName() + " bouge vers " + destinationIndex + " la");
+                System.out.println(getName() + " bouge vers " + destinationIndex);
             }
             environment.seDeplacer(this, destinationIndex);
             strategy.removeClaimer(environment);
-        } else {
-            if (environment.verbose) {
-                System.out.println(getName() + " demande a liberer la stack " + destinationIndex);
-            }
-            strategy.askToMove(this, destinationIndex, environment);
         }
+        else{
+            if (environment.getPile(destinationIndex).lastElement() == getGoal()) {
+                if (environment.verbose) {
+                    System.out.println(getName() + " bouge vers " + destinationIndex);
+                }
+                environment.seDeplacer(this, destinationIndex);
+                strategy.removeClaimer(environment);
+            } else {
+                if (environment.verbose) {
+                    System.out.println(getName() + " demande a liberer la stack " + destinationIndex);
+                }
+                strategy.askToMove(this, destinationIndex, environment);
+            }
+        }
+
     }
 
     public void isBlockedAction(Environnement environment) {

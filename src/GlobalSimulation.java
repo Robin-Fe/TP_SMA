@@ -3,18 +3,19 @@ import java.util.List;
 import java.util.Random;
 
 public class GlobalSimulation {
-
     private final List<GlobalAgent> agents;
     private final Environnement environment;
     private final GlobalStrategy strategy;
     public boolean verbose;
+    public final int nbPiles;
 
-    public GlobalSimulation(boolean verbose, boolean randomOrdering, int nbAgents, GlobalStrategy strategy) {
+    public GlobalSimulation(boolean verbose, boolean randomOrdering, int nbAgents, GlobalStrategy strategy, int nbPiles) {
+        this.nbPiles = nbPiles;
         this.verbose = verbose;
         this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
-        Environnement environment = new Environnement(3, table, nbAgents, verbose);
+        Environnement environment = new Environnement(nbPiles, table, nbAgents, verbose);
         GlobalAgent A = new GlobalAgent("A", table, strategy);
         GlobalAgent B = new GlobalAgent("B", A, strategy);
         GlobalAgent C = new GlobalAgent("C", B, strategy);
@@ -50,13 +51,15 @@ public class GlobalSimulation {
 
     public int runSimulation() {
         int nbTours = 0;
-        while (!(testFinSimulation()) && nbTours <50) {
+        while (!(testFinSimulation())) {
             nbTours++;
             if (verbose) {
                 System.out.println("\n");
                 environment.printEnvironment();
             }
-
+            allAgentSharePosition(strategy, environment);
+            //System.out.println("MAPPING");
+            //strategy.printEnvironment();
             allAgentPerception(environment);
             getClaimerAgent().action(environment);
             allAgentPerception(environment);
@@ -64,6 +67,8 @@ public class GlobalSimulation {
         System.out.println("\n");
         environment.printEnvironment();
         System.out.println("\nNb Tours = " + nbTours);
+        System.out.println("//////////////////////////////////////////////////////////////////////////////");
+
         return nbTours;
     }
 
@@ -83,6 +88,14 @@ public class GlobalSimulation {
     public void allAgentPerception(Environnement environment) {
         for (GlobalAgent agent : agents) {
             agent.perception(environment);
+        }
+    }
+
+    public void allAgentSharePosition(GlobalStrategy strategy, Environnement environment){
+        strategy.resetMap();
+        for (GlobalAgent agent : agents){
+            strategy.sharePosition(agent, environment.getPreviousAgent(agent), this.nbPiles);
+
         }
     }
 }
