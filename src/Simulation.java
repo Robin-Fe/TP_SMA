@@ -3,16 +3,19 @@ import java.util.List;
 import java.util.Random;
 
 public class Simulation {
-
     private final List<Agent> agents;
-    private final Environnement environment;
+    private final Strategy strategy;
+    private final Environment environment;
     public boolean verbose;
+    public final int nbPiles;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents) {
+    public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgents, int nbPiles) {
+        this.nbPiles = nbPiles;
         this.verbose = verbose;
+        this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
-        Environnement environment = new Environnement(3, table, nbAgents, verbose);
+        Environment environment = new Environment(nbPiles, table, nbAgents, verbose);
         Agent A = new Agent("A", table);
         Agent B = new Agent("B", A);
         Agent C = new Agent("C", B);
@@ -28,7 +31,7 @@ public class Simulation {
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
             for (int i = 0; i < agents.size(); i++) {
-                while (environment.getPlace(agents.get(r1)) != -100) {
+                while (environment.getPlace(agents.get(r1)) != -1) {
                     r1 = new Random().nextInt(agents.size());
                 }
                 int r2 = new Random().nextInt(environment.getNbPiles());
@@ -45,26 +48,26 @@ public class Simulation {
         this.environment = environment;
     }
 
+
     public int runSimulation() {
-        int nbTours = 0;
         while (!(testFinSimulation())) {
-            nbTours++;
             if (verbose) {
                 System.out.println("\n");
                 environment.printEnvironment();
             }
-            //ToDo : Comment on choisi l'agent ?
-            Agent agentChoisi = choisirAgentRandom();
-            agentChoisi.perception(environment);
-            agentChoisi.action(environment);
-            agentChoisi.perception(environment);
+            strategy.beforePerception(agents, environment, nbPiles);
+            allAgentPerception(strategy, environment);
+            strategy.getActionAgent(agents, environment).action(strategy, environment);
+            allAgentPerception(strategy, environment);
         }
-        System.out.println("\n");
-        environment.printEnvironment();
-        System.out.println("\nNb Tours = " + nbTours);
-        return nbTours;
+        if (verbose){
+            System.out.println("\n");
+            environment.printEnvironment();
+            System.out.println("\nNb Tours = " + environment.getnbDeplacements());
+            System.out.println("//////////////////////////////////////////////////////////////////////////////");
+        }
+        return environment.getnbDeplacements();
     }
-
 
     public boolean testFinSimulation() {
         for (Agent agent : agents) {
@@ -75,8 +78,13 @@ public class Simulation {
         return true;
     }
 
-    public Agent choisirAgentRandom() {
-        int r = new Random().nextInt(agents.size());
-        return agents.get(r);
+
+
+    public void allAgentPerception(Strategy strategy, Environment environment) {
+        for (Agent agent : agents) {
+            agent.perception(strategy, environment);
+        }
     }
+
+
 }

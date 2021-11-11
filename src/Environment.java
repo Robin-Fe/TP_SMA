@@ -2,17 +2,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class Environnement {
+public class Environment {
     //ToDo : simplifier certaines méthodes
     private final List<Stack<Agent>> piles;
     private final int nbPiles;
     private final Objet table;
     private final int nbAgent;
     public boolean verbose;
+    public int nbDeplacements = 0;
+    
+    public Objet getTable(){
+        return this.table;
+    }
 
-
-
-    public Environnement(int nbPiles, Objet table, int nbAgent, boolean verbose) {
+    public Environment(int nbPiles, Objet table, int nbAgent, boolean verbose) {
         this.verbose = verbose;
         this.nbPiles = nbPiles;
         this.nbAgent = nbAgent;
@@ -33,6 +36,7 @@ public class Environnement {
         Stack<Agent> pileDepart = getPile(getPlace(agent));
         Agent agentPop = pileDepart.pop();
         pileArrivee.push(agentPop);
+        this.nbDeplacements++;
     }
 
     public Agent getNextAgent(Agent agent) {
@@ -65,7 +69,7 @@ public class Environnement {
                 return i;
             }
         }
-        return -100;
+        return -1;
     }
 
 
@@ -147,5 +151,7 @@ public class Environnement {
         return lowestStackIndex;
     }
 
-
+    public int getnbDeplacements() {
+        return nbDeplacements;
+    }
 }

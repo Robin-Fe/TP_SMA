@@ -1,110 +1,73 @@
 import java.util.*;
 
-public class GlobalStrategy {
-    private Stack<GlobalAgent> claimers = new Stack<>(); // Stack which shows who is gonna move
-    private Stack<GlobalAgent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
-    private Stack<Stack<GlobalAgent>> map = new Stack<>(); // Map of the environment;
+public class GlobalStrategy extends Strategy {
+    private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
+    private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
+    Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
 
-    public GlobalStrategy() {}
+    public GlobalStrategy() {
+    }
 
-    public void sharePosition(Agent agent, Object pointer, int nbPiles) {
-        Stack<Stack<GlobalAgent>> removeStacks = new Stack<>();
-        Stack<Stack<GlobalAgent>> addStacks = new Stack<>();
-        if (!(pointer instanceof Agent)) {
-            // Si l'agent doit aller sur la table, il se mappe sur une nouvelle pile
-            Stack<GlobalAgent> newStack = new Stack<>();
-            newStack.add((GlobalAgent) agent);
-            map.add(newStack);
+
+    @Override
+    public void perception(Agent agent, Environment environment) {
+        if (!(agent.getGoal() instanceof Agent)) {
+            if (agent.getGoalAchieved()) {
+                this.sleep(agent);
+            } else {
+                this.addClaimer(environment, agent);
+            }
         } else {
-            if (this.map.size() == 0) {
-                // S'il n'y a pas de piles mappées, l'agent crée une pile et ajoute son obj et lui-même
-                Stack<GlobalAgent> newStack = new Stack<>();
-                newStack.add((GlobalAgent) pointer);
-                newStack.add((GlobalAgent) agent);
-                this.map.add(newStack);
-            } else {
-                // S'il y a des pile, il va voir s'il trouve son objectif
-                boolean isPointerHere = false;
-                for (Stack<GlobalAgent> stack : this.map) {
-                    if (stack.contains(pointer)) {
-                        // Si oui, il va se mapper dessus
-                        isPointerHere = true;
-                        stack.add((GlobalAgent) agent);
-                    }
-                }
-                if (!isPointerHere) {
-                    // Sinon, il va créer une pile et mapper son objectif et lui-même
-                    Stack<GlobalAgent> newStack = new Stack<>();
-                    newStack.add((GlobalAgent) pointer);
-                    newStack.add((GlobalAgent) agent);
-                    this.map.add(newStack);
-                }
-            }
-        }
-        for (Stack<GlobalAgent> firstStack : this.map) {
-            if (firstStack.size() != 0) {
-                GlobalAgent firstAgent = firstStack.get(0);
-                for (Stack<GlobalAgent> secondStack : this.map) {
-                    if (firstStack != secondStack) {
-                        if (secondStack.size() != 0) {
-                            if (secondStack.get(secondStack.size() - 1) == firstAgent) {
-                                for (GlobalAgent oneAgent : firstStack) {
-                                    if (oneAgent != firstAgent) {
-                                        secondStack.add(oneAgent);
-                                    }
-                                    //removeStacks.add(firstStack);
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-
-        }
-        for (Stack<GlobalAgent> stack1 : this.map) {
-            for (Stack<GlobalAgent> stack2 : this.map) {
-                if (stack1 != stack2) {
-                    if (stack1.containsAll(stack2)) {
-                        if (stack2.containsAll(stack1)) {
-                            addStacks.add(stack1);
-                        }
-                        removeStacks.add(stack2);
-                    }
-                }
-            }
-        }
-        for (Stack<GlobalAgent> stack : removeStacks) {
-            this.map.remove(stack);
-        }
-        for (int index = 0; index < addStacks.size(); index += 2) {
-            this.map.add(addStacks.get(index));
-        }
-        while (this.map.size() < nbPiles) {
-            this.map.add(new Stack<>());
-        }
-    }
-
-    public void printEnvironment() {
-        for (int i = map.size() - 1; i >= 0; i--) {
-            Stack<GlobalAgent> pile = map.get(i);
-            StringBuilder string = new StringBuilder();
-            for (Agent agent : pile) {
-                string.append(agent.getName()).append(" ");
-            }
-            if (!string.toString().equals("")) {
-                int nb = 2 * 5 - string.length();
-                string.append(" ".repeat(Math.max(0, nb)));
-                System.out.println("[ " + string + "]");
-            } else {
-                string.append(" ".repeat(Math.max(0, 1 + 2 * 5)));
-                System.out.println("[" + string + "]");
+            if (agent.getGoalAchieved() && this.getSleepers().contains(agent.getGoal())) {
+                this.sleep(agent);
             }
         }
     }
 
+    @Override
+    public Agent getActionAgent(List<Agent> agents, Environment environment) {
+        if (this.claimers.size() == 0) {
+            Agent lastSleeper = sleepers.lastElement();
+            for (Stack<Agent> stack : environment.getPiles()) {
+                for (Agent agent : stack) {
+                    if (agent.getGoal() == lastSleeper) {
+                        claimers.add((Agent) agent);
+                    }
+                }
+            }
+        }
+        return this.claimers.lastElement();
+    }
 
-    public void addClaimer(Environnement environment, GlobalAgent agent) {
+
+    @Override
+    public void action(Agent agent, Environment environment) {
+        if (!(agent.getGoal() instanceof Agent)) {
+            firstAgentAction(agent, environment);
+        } else {
+            if (agent.getPushed()) {
+                isPushedAction(agent, environment);
+            } else {
+                if (agent.getFree()) {
+                    isFreeAction(agent, environment);
+                } else {
+                    isBlockedAction(agent, environment);
+                }
+            }
+        }
+    }
+
+    public void sleep(Agent agent) {
+        if (!sleepers.contains(agent)) {
+            sleepers.add(agent);
+        }
+    }
+
+    public Stack<Agent> getSleepers() {
+        return this.sleepers;
+    }
+
+    public void addClaimer(Environment environment, Agent agent) {
         if (!(this.claimers.contains(agent))) {
             this.claimers.add(agent);
         }
@@ -113,25 +76,11 @@ public class GlobalStrategy {
         }
     }
 
-    public void removeClaimer(Environnement environment) {
+    public void removeClaimer(Environment environment) {
         this.claimers.removeElementAt(claimers.size() - 1);
         if (environment.verbose) {
             System.out.println("CLAIMERS : " + printClaimers());
         }
-    }
-
-    public GlobalAgent getLastClaimer(Environnement environnement) {
-        if (this.claimers.size() == 0) {
-            GlobalAgent lastSleeper = sleepers.lastElement();
-            for (Stack<Agent> stack : environnement.getPiles()) {
-                for (Agent agent : stack) {
-                    if (agent.getGoal() == lastSleeper) {
-                        claimers.add((GlobalAgent) agent);
-                    }
-                }
-            }
-        }
-        return this.claimers.lastElement();
     }
 
 
@@ -148,7 +97,7 @@ public class GlobalStrategy {
     }
 
 
-    public void askToMove(GlobalAgent agent, int objectiveIndex, Environnement environment) {
+    public void askToMove(Agent agent, int objectiveIndex, Environment environment) {
         // Ask the other to free de destination Stack
         int usedStackIndex = environment.getPlace(agent);
         ArrayList<Integer> choices = new ArrayList<>();
@@ -157,6 +106,7 @@ public class GlobalStrategy {
         }
         choices.remove((Object) usedStackIndex);
         choices.remove((Object) objectiveIndex);
+
         int destinationIndex = new Random().nextInt(environment.getNbPiles());
         while (!choices.contains(destinationIndex)) {
             destinationIndex = new Random().nextInt(environment.getNbPiles());
@@ -167,23 +117,14 @@ public class GlobalStrategy {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
                 }
-                ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
-                addClaimer(environment, (GlobalAgent) oneAgent);
+                setPush(oneAgent, true, destinationIndex);
+                addClaimer(environment, oneAgent);
             }
         }
     }
 
-    public void sleep(GlobalAgent agent) {
-        if (!sleepers.contains(agent)) {
-            sleepers.add(agent);
-        }
-    }
 
-    public Stack<GlobalAgent> getSleepers() {
-        return this.sleepers;
-    }
-
-    public void askToBeFree(GlobalAgent agent, Environnement environment) {
+    public void askToBeFree(Agent agent, Environment environment) {
         // Push Everoyone at the top, and ask them to let the objective stack free
         int usedStackIndex = environment.getPlace(agent);
         int destinationStackIndex;
@@ -208,13 +149,13 @@ public class GlobalStrategy {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " push " + oneAgent.getName() + " a la destination " + destinationIndex);
                 }
-                ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
-                addClaimer(environment, (GlobalAgent) oneAgent);
+                setPush(oneAgent, true, destinationIndex);
+                addClaimer(environment, oneAgent);
             }
         }
     }
 
-    public void askEmptyStack(Environnement environment, GlobalAgent agent) {
+    public void askEmptyStack(Environment environment, Agent agent) {
         int usedStackIndex = environment.getPlace(agent);
         int lowestStackIndex = environment.getLowestStack();
         ArrayList<Integer> choices = new ArrayList<>();
@@ -231,14 +172,93 @@ public class GlobalStrategy {
             if (environment.verbose) {
                 System.out.println(agent.getName() + " demande à " + oneAgent.getName() + " de bouger vers " + destinationIndex);
             }
-            ((GlobalAgent) oneAgent).setPush(true, destinationIndex);
-            addClaimer(environment, (GlobalAgent) oneAgent);
+            setPush(oneAgent, true, destinationIndex);
+            addClaimer(environment, oneAgent);
         }
     }
 
-    public void resetMap() {
-        this.map = new Stack<>();
+
+    public void firstAgentAction(Agent agent, Environment environment) {
+        if (agent.getFree()) {
+            if (environment.getIsOneStackFree()) {
+                if (environment.verbose) {
+                    System.out.println(agent.getName() + " bouge vers " + environment.getStackFree());
+                }
+                environment.seDeplacer(agent, environment.getStackFree());
+                this.removeClaimer(environment);
+
+            } else {
+                if (environment.verbose) {
+                    System.out.println(agent.getName() + " demande une empty stack ");
+                }
+                this.askEmptyStack(environment, agent);
+            }
+        } else {
+            if (environment.verbose) {
+                System.out.println(agent.getName() + " push");
+            }
+            this.askToBeFree(agent, environment);
+            environment.push(agent);
+        }
     }
 
+    public void isPushedAction(Agent agent, Environment environment) {
+        if (environment.verbose) {
+            System.out.println(agent.getName() + " bouge vers " + destinationIndexes.get(agent));
+        }
+        environment.seDeplacer(agent, destinationIndexes.get(agent));
+        this.removeClaimer(environment);
+    }
+
+    public void isFreeAction(Agent agent, Environment environment) {
+        int destinationIndex = environment.getPlace((Agent) agent.getGoal());
+        int agentIndex = environment.getPlace(agent);
+        if (agentIndex == destinationIndex) {
+            ArrayList<Integer> choices = new ArrayList<>();
+            for (int i = 0; i <= environment.getNbPiles() - 1; i++) {
+                choices.add(i);
+            }
+            choices.remove((Object) agentIndex);
+            destinationIndex = new Random().nextInt(environment.getNbPiles());
+            while (!choices.contains(destinationIndex)) {
+                destinationIndex = new Random().nextInt(environment.getNbPiles());
+            }
+            if (environment.verbose) {
+                System.out.println(agent.getName() + " bouge vers " + destinationIndex);
+            }
+            environment.seDeplacer(agent, destinationIndex);
+            this.removeClaimer(environment);
+        } else {
+            if (environment.getPile(destinationIndex).lastElement() == agent.getGoal()) {
+                if (environment.verbose) {
+                    System.out.println(agent.getName() + " bouge vers " + destinationIndex);
+                }
+                environment.seDeplacer(agent, destinationIndex);
+                this.removeClaimer(environment);
+            } else {
+                if (environment.verbose) {
+                    System.out.println(agent.getName() + " demande a liberer la stack " + destinationIndex);
+                }
+                this.askToMove(agent, destinationIndex, environment);
+            }
+        }
+    }
+
+    public void isBlockedAction(Agent agent, Environment environment) {
+        if (environment.verbose) {
+            System.out.println(agent.getName() + " ask to be free");
+        }
+        this.askToBeFree(agent, environment);
+    }
+
+    public void setPush(Agent agent, boolean isPushed, int destinationIndex) {
+        agent.setPushed(isPushed);
+        if (isPushed) {
+            destinationIndexes.put(agent, destinationIndex);
+        } else {
+            destinationIndexes.remove(agent);
+        }
+    }
 
 }
+
