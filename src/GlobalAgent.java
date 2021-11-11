@@ -79,12 +79,12 @@ public class GlobalAgent extends Agent {
     public void isFreeAction(Environnement environment) {
         destinationIndex = environment.getPlace((Agent) getGoal());
         int agentIndex = environment.getPlace(this);
-        if (agentIndex == destinationIndex){
+        if (agentIndex == destinationIndex) {
             ArrayList<Integer> choices = new ArrayList<>();
             for (int i = 0; i <= environment.getNbPiles() - 1; i++) {
                 choices.add(i);
             }
-            choices.remove((Object)agentIndex);
+            choices.remove((Object) agentIndex);
             int destinationIndex = new Random().nextInt(environment.getNbPiles());
             while (!choices.contains(destinationIndex)) {
                 destinationIndex = new Random().nextInt(environment.getNbPiles());
@@ -94,8 +94,7 @@ public class GlobalAgent extends Agent {
             }
             environment.seDeplacer(this, destinationIndex);
             strategy.removeClaimer(environment);
-        }
-        else{
+        } else {
             if (environment.getPile(destinationIndex).lastElement() == getGoal()) {
                 if (environment.verbose) {
                     System.out.println(getName() + " bouge vers " + destinationIndex);
@@ -127,10 +126,4 @@ public class GlobalAgent extends Agent {
             this.destinationIndex = null;
         }
     }
-
-    public void claim(Environnement environment) {
-        strategy.addClaimer(environment, this);
-    }
-
-
 }
