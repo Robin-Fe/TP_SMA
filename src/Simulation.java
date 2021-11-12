@@ -10,17 +10,16 @@ public class Simulation {
     public boolean verbose;
     public Politique AgentElection;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentAction, Politique AgentDestination) {
+    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentDestination) {
         this.AgentElection = AgentElection;
         this.verbose = verbose;
-        //TODO : A rendre modulaire (partiellement fait)
         Objet table = new Objet("Table", null);
         Environnement environnement = new Environnement(3, table, nbAgents, verbose);
-        Agent A = new Agent("A", table, AgentAction, AgentDestination);
+        Agent A = new Agent("A", table, AgentDestination);
         List<Agent> agents = new ArrayList<>();
         agents.add(A);
         for (int i = 1; i < nbAgents; i++) {
-            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentAction, AgentDestination));
+            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentDestination));
         }
 
         if (randomOrdering) {

@@ -16,6 +16,9 @@ public class SmartAgentPickingPolitique implements Politique{
                 possibleChoices.add(agent);
             }
         }
+        if (new Random().nextInt(100) > 50) {
+            return possibleChoices.get(0);
+        }
         return possibleChoices.get(new Random().nextInt(possibleChoices.size()));
     }
 }

@@ -2,12 +2,10 @@ import java.util.Collections;
 
 public class Agent extends Objet {
 
-    public Politique AgentAction;
     public Politique AgentDestination;
 
-    public Agent(String name, Objet goal, Politique AgentAction, Politique AgentDestination) {
+    public Agent(String name, Objet goal, Politique AgentDestination) {
         super(name, goal);
-        this.AgentAction = AgentAction;
         this.AgentDestination = AgentDestination;
     }
 
@@ -18,7 +16,6 @@ public class Agent extends Objet {
     }
 
     public void action(Environnement environment) {
-        // ToDo : Comment l'agent choisit son action ?
         if (!getGoalAchieved() || getPushed()) {
             tryToMove(environment);
         } else {

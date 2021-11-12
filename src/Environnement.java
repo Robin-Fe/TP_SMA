@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.Stack;
 
 public class Environnement {
-    //ToDo : simplifier certaines méthodes
     private final List<Stack<Agent>> piles;
     private final int nbPiles;
     private final Objet table;
