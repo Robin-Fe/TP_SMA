@@ -1,9 +1,10 @@
 import java.util.*;
 
 public class GlobalStrategy implements Strategy {
-    private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
-    private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
-    private Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
+    private final Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
+    private final Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
+    private final Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
+    private int nbActions = 0;
 
     public GlobalStrategy() {
     }
@@ -35,7 +36,7 @@ public class GlobalStrategy implements Strategy {
             for (Stack<Agent> stack : environment.getPiles()) {
                 for (Agent agent : stack) {
                     if (agent.getGoal() == lastSleeper) {
-                        claimers.add((Agent) agent);
+                        claimers.add(agent);
                     }
                 }
             }
@@ -46,6 +47,7 @@ public class GlobalStrategy implements Strategy {
 
     @Override
     public void action(Agent agent, Environment environment) {
+        this.nbActions++;
         if (!(agent.getGoal() instanceof Agent)) {
             firstAgentAction(agent, environment);
         } else {
@@ -264,5 +266,14 @@ public class GlobalStrategy implements Strategy {
         }
     }
 
+    @Override
+    public int getNbActions() {
+        return this.nbActions;
+    }
+
+    @Override
+    public void resetNbActions() {
+        this.nbActions = 0;
+    }
 }
 

@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomStrategy implements Strategy {
+    private int nbActions = 0;
 
     @Override
     public void beforePerception(List<Agent> agents, Environment environment) {
@@ -22,6 +23,7 @@ public class RandomStrategy implements Strategy {
 
     @Override
     public void action(Agent agent, Environment environment) {
+        this.nbActions++;
         if (!agent.getGoalAchieved()) {
             tryToMove(agent, environment);
         } else {
@@ -33,6 +35,12 @@ public class RandomStrategy implements Strategy {
                 }
             }
         }
+    }
+
+
+    @Override
+    public int getNbActions() {
+        return this.nbActions;
     }
 
     public void tryToMove(Agent agent, Environment environment) {
@@ -48,5 +56,10 @@ public class RandomStrategy implements Strategy {
             }
             environment.push(agent);
         }
+    }
+
+    @Override
+    public void resetNbActions() {
+        this.nbActions = 0;
     }
 }

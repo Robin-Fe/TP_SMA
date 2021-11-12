@@ -148,7 +148,7 @@ public class Environment {
         return lowestStackIndex;
     }
 
-    public int getnbDeplacements() {
+    public int getNbDeplacements() {
         return nbDeplacements;
     }
 }

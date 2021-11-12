@@ -7,6 +7,8 @@ public class Simulation {
     private final Strategy strategy;
     private final Environment environment;
     public boolean verbose;
+    private int deplacementScore = 0;
+    private int actionScore = 0;
 
     public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgentss, int nbPiles) {
         this.verbose = verbose;
@@ -47,7 +49,8 @@ public class Simulation {
     }
 
 
-    public int runSimulation() {
+    public void runSimulation() {
+        this.strategy.resetNbActions();
         while (!(testFinSimulation())) {
             if (verbose) {
                 System.out.println("\n");
@@ -58,13 +61,14 @@ public class Simulation {
             strategy.getActionAgent(agents, environment).action(strategy, environment);
             allAgentPerception(strategy, environment);
         }
-        if (verbose){
+        if (verbose) {
             System.out.println("\n");
             environment.printEnvironment();
-            System.out.println("\nNb Tours = " + environment.getnbDeplacements());
+            System.out.println("\nNb Tours = " + environment.getNbDeplacements());
             System.out.println("//////////////////////////////////////////////////////////////////////////////");
         }
-        return environment.getnbDeplacements();
+        this.deplacementScore = environment.getNbDeplacements();
+        this.actionScore = strategy.getNbActions();
     }
 
     public boolean testFinSimulation() {
@@ -77,12 +81,18 @@ public class Simulation {
     }
 
 
-
     public void allAgentPerception(Strategy strategy, Environment environment) {
         for (Agent agent : agents) {
             agent.perception(strategy, environment);
         }
     }
 
+    public int getDeplacementScore() {
+        return deplacementScore;
+    }
+
+    public int getActionScore() {
+        return actionScore;
+    }
 
 }

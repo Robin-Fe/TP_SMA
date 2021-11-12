@@ -1,11 +1,12 @@
 import java.util.*;
 
 public class CommunicateStrategy implements Strategy {
-    private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
-    private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
+    private final Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
+    private final Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
     private Mapping map = new Mapping();
-    private Map<Agent, Objet> destinationAgents = new HashMap<Agent, Objet>();
-
+    private final Map<Agent, Objet> destinationAgents = new HashMap<>();
+    private int nbActions = 0;
+    
     @Override
     public void beforePerception(List<Agent> agents, Environment environment) {
         map.resetMap();
@@ -22,7 +23,7 @@ public class CommunicateStrategy implements Strategy {
             for (Stack<Agent> stack : environment.getPiles()) {
                 for (Agent agent : stack) {
                     if (agent.getGoal() == lastSleeper) {
-                        claimers.add((Agent) agent);
+                        claimers.add(agent);
                     }
                 }
             }
@@ -47,6 +48,7 @@ public class CommunicateStrategy implements Strategy {
 
     @Override
     public void action(Agent agent, Environment environment) {
+        this.nbActions++;
         if (!(agent.getGoal() instanceof Agent)) {
             firstAgentAction(agent, environment);
         } else {
@@ -335,5 +337,13 @@ public class CommunicateStrategy implements Strategy {
         return string.toString();
     }
 
+    @Override
+    public int getNbActions() {
+        return this.nbActions;
+    }
 
+    @Override
+    public void resetNbActions() {
+        this.nbActions = 0;
+    }
 }

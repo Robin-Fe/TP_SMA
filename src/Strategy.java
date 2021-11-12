@@ -1,6 +1,7 @@
 import java.util.List;
 
 public interface Strategy {
+
     void beforePerception(List<Agent> agents, Environment environment);
 
     Agent getActionAgent(List<Agent> agents, Environment environment);
@@ -9,4 +10,7 @@ public interface Strategy {
 
     void action(Agent agent, Environment environment);
 
+    int getNbActions();
+
+    void resetNbActions();
 }
