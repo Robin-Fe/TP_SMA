@@ -10,12 +10,12 @@ public class Simulation {
     private int deplacementScore = 0;
     private int actionScore = 0;
 
-    public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgentss, int nbPiles) {
+    public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgents, int nbPiles) {
         this.verbose = verbose;
         this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
-        Environment environment = new Environment(nbPiles, table, nbAgentss, verbose);
+        Environment environment = new Environment(nbPiles, table, nbAgents, verbose);
         Agent A = new Agent("A", table);
         Agent B = new Agent("B", A);
         Agent C = new Agent("C", B);
@@ -26,8 +26,24 @@ public class Simulation {
         Agent H = new Agent("H", G);
         Agent I = new Agent("I", H);
         Agent J = new Agent("J", I);
-        List<Agent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
-        agents = agents.subList(0, nbAgentss);
+        Agent K = new Agent("K", J);
+        Agent L = new Agent("L", K);
+        Agent M = new Agent("M", L);
+        Agent N = new Agent("N", M);
+        Agent O = new Agent("O", N);
+        Agent P = new Agent("P", O);
+        Agent Q = new Agent("Q", P);
+        Agent R = new Agent("R", Q);
+        Agent S = new Agent("S", R);
+        Agent T = new Agent("T", S);
+        Agent U = new Agent("U", T);
+        Agent V = new Agent("V", U);
+        Agent W = new Agent("W", V);
+        Agent X = new Agent("X", W);
+        Agent Y = new Agent("Y", X);
+        Agent Z = new Agent("Z", Y);
+        List<Agent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+        agents = agents.subList(0, nbAgents);
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
             for (int i = 0; i < agents.size(); i++) {
@@ -38,11 +54,9 @@ public class Simulation {
                 environment.addAgent(agents.get(r1), r2);
             }
         } else {
-            //ToDo : add le bon nombre d'agent
-            environment.addAgent(C, 0);
-            environment.addAgent(D, 0);
-            environment.addAgent(A, 0);
-            environment.addAgent(B, 0);
+            for (int i = agents.size()-1; i >= 0; i--) {
+                environment.addAgent(agents.get(i), 0);
+            }
         }
         this.agents = agents;
         this.environment = environment;

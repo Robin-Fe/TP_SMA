@@ -67,7 +67,7 @@ public class Mapping {
             for (Stack<Agent> stack2 : this.map) {
                 if (stack1 != stack2) {
                     if (stack1.containsAll(stack2)) {
-                        if (stack2.containsAll(stack1)) {
+                        if (stack2.containsAll(stack1) && stack1.size()!= 0) {
                             addStacks.add(stack1);
                         }
                         removeStacks.add(stack2);

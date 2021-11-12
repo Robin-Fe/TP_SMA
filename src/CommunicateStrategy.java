@@ -6,14 +6,13 @@ public class CommunicateStrategy implements Strategy {
     private Mapping map = new Mapping();
     private final Map<Agent, Objet> destinationAgents = new HashMap<>();
     private int nbActions = 0;
-    
+
     @Override
     public void beforePerception(List<Agent> agents, Environment environment) {
         map.resetMap();
         for (Agent agent : agents) {
             this.map = map.shareAgentPosition(agent, environment.getPreviousAgent(agent), environment.getNbPiles());
         }
-        //this.map.printMap();
     }
 
     @Override
@@ -192,6 +191,7 @@ public class CommunicateStrategy implements Strategy {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " essaie d'aller sur la stack libre");
                 }
+                int i = 0;
                 while ((environment.getPreviousAgent(agent) instanceof Agent)) {
                     int destinationIndex = new Random().nextInt(environment.getNbPiles());
                     while (destinationIndex == environment.getPlace(agent)) {
@@ -201,8 +201,10 @@ public class CommunicateStrategy implements Strategy {
                         System.out.println(agent.getName() + " bouge vers " + destinationIndex);
                     }
                     environment.seDeplacer(agent, destinationIndex);
+                    i++;
                 }
                 this.removeClaimer(environment);
+                this.nbActions+=i;
             } else {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " demande une empty stack ");
@@ -222,6 +224,7 @@ public class CommunicateStrategy implements Strategy {
         if (environment.verbose) {
             System.out.println(agent.getName() + " essaie de bouger vers " + destinationAgents.get(agent).getName());
         }
+        int i = 0;
         while (environment.getPreviousAgent(agent) != destinationAgents.get(agent)) {
             int destinationIndex = new Random().nextInt(environment.getNbPiles());
             while (destinationIndex == environment.getPlace(agent)) { // L'agent doit se déplacer sur une pile autre que la sienne
@@ -231,8 +234,10 @@ public class CommunicateStrategy implements Strategy {
                 System.out.println(agent.getName() + " bouge vers " + destinationIndex);
             }
             environment.seDeplacer(agent, destinationIndex);
+            i++;
         }
         this.removeClaimer(environment);
+        this.nbActions += i;
     }
 
     public void isFreeAction(Agent agent, Environment environment) {
@@ -254,6 +259,7 @@ public class CommunicateStrategy implements Strategy {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " essaie d'aller sur " + destinationAgents.get(agent).getName());
                 }
+                int i = 0;
                 while (environment.getPreviousAgent(agent) != destinationAgents.get(agent)) {
                     int destinationIndexTest = new Random().nextInt(environment.getNbPiles());
                     while (destinationIndexTest != environment.getPlace(agent)) {
@@ -263,13 +269,16 @@ public class CommunicateStrategy implements Strategy {
                         System.out.println(agent.getName() + " bouge vers " + destinationIndexTest);
                     }
                     environment.seDeplacer(agent, destinationIndexTest);
+                    i++;
                 }
+                this.nbActions += i;
                 this.removeClaimer(environment);
             } else {
                 if (map.isAgentFree((Agent) agent.getGoal())) {
                     if (environment.verbose) {
                         System.out.println(agent.getName() + " tente de bouger vers " + agent.getGoal().getName());
                     }
+                    int i = 0;
                     while (environment.getPreviousAgent(agent) != agent.getGoal()) {
                         destinationIndex = new Random().nextInt(environment.getNbPiles());
                         while (destinationIndex == environment.getPlace(agent)) { // L'agent doit se déplacer sur une pile autre que la sienne
@@ -279,8 +288,10 @@ public class CommunicateStrategy implements Strategy {
                             System.out.println(agent.getName() + " bouge vers " + destinationIndex);
                         }
                         environment.seDeplacer(agent, destinationIndex);
+                        i++;
                     }
                     this.removeClaimer(environment);
+                    this.nbActions += i;
                 } else {
                     if (environment.verbose) {
                         System.out.println(agent.getName() + " demande a liberer la stack de " + agent.getGoal().getName());

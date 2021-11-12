@@ -7,23 +7,32 @@ public class Main {
         int actionRandomScore = 0;
         int actionCommunicationScore = 0;
         int actionGlobalScore = 0;
-        int nbSimulations = 100;
+        int nbSimulations = 500;
+        boolean verbose = false;
+        boolean isRandom = true;
+        int nbAgents = 20;
+        int nbPiles = 10;
         RandomStrategy randomStrategy = new RandomStrategy();
         CommunicateStrategy communicateStrategy = new CommunicateStrategy();
         GlobalStrategy globalStrategy = new GlobalStrategy();
-        for (int i = 0; i < nbSimulations; i++) {
-            Simulation randomSimulation = new Simulation(false, true, randomStrategy, 10, 3);
-            Simulation communicateSimulation = new Simulation(false, true, communicateStrategy, 10, 3);
-            Simulation globalSimulation = new Simulation(false, true, globalStrategy, 10, 3);
+        for (int i = 0; i < nbSimulations; i++) { ;
+            System.out.println(i);
+            Simulation randomSimulation = new Simulation(verbose, isRandom, randomStrategy, nbAgents, nbPiles);
             randomSimulation.runSimulation();
-            communicateSimulation.runSimulation();
-            globalSimulation.runSimulation();
             deplacementsRandomScore += randomSimulation.getDeplacementScore();
-            deplacementsCommunicationScore += communicateSimulation.getDeplacementScore();
-            deplacementsGlobalScore += globalSimulation.getDeplacementScore();
             actionRandomScore += randomSimulation.getActionScore();
+
+            Simulation communicateSimulation = new Simulation(verbose, isRandom, communicateStrategy, nbAgents, nbPiles);
+            communicateSimulation.runSimulation();
+            deplacementsCommunicationScore += communicateSimulation.getDeplacementScore();
             actionCommunicationScore += communicateSimulation.getActionScore();
+
+
+            Simulation globalSimulation = new Simulation(verbose, isRandom, globalStrategy, nbAgents, nbPiles);
+            globalSimulation.runSimulation();
+            deplacementsGlobalScore += globalSimulation.getDeplacementScore();
             actionGlobalScore += globalSimulation.getActionScore();
+
         }
         System.out.println("Pour " + nbSimulations + " Simulations : \n");
         System.out.println("Deplacements - Score moyen random : " + deplacementsRandomScore/nbSimulations );
