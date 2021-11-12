@@ -6,13 +6,12 @@ public class Mapping {
     public Mapping() {
     }
 
-    ;
 
     public void resetMap() {
         this.map = new Stack<>();
     }
 
-    public Mapping shareAgentPosition(Agent agent, Object pointer, int nbPiles) {
+    public Mapping shareAgentPosition(Agent agent, Objet pointer, int nbPiles) {
         Stack<Stack<Agent>> removeStacks = new Stack<>();
         Stack<Stack<Agent>> addStacks = new Stack<>();
         if (!(pointer instanceof Agent)) {

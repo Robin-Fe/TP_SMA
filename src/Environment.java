@@ -3,22 +3,19 @@ import java.util.List;
 import java.util.Stack;
 
 public class Environment {
-    //ToDo : simplifier certaines méthodes
     private final List<Stack<Agent>> piles;
-    private final int nbPiles;
     private final Objet table;
-    private final int nbAgent;
+    private final int nbAgents;
+    private int nbDeplacements = 0;
     public boolean verbose;
-    public int nbDeplacements = 0;
-    
+
     public Objet getTable(){
         return this.table;
     }
 
-    public Environment(int nbPiles, Objet table, int nbAgent, boolean verbose) {
+    public Environment(int nbPiles, Objet table, int nbAgents, boolean verbose) {
         this.verbose = verbose;
-        this.nbPiles = nbPiles;
-        this.nbAgent = nbAgent;
+        this.nbAgents = nbAgents;
         this.piles = new ArrayList<>(nbPiles);
         for (int i = 0; i < nbPiles; i++) {
             Stack<Agent> pile = new Stack<>();
@@ -56,7 +53,7 @@ public class Environment {
     }
 
     public Stack<Agent> getPile(int place) {
-        return this.getPiles().get(place);
+        return this.piles.get(place);
     }
 
     public List<Stack<Agent>> getPiles() {
@@ -64,7 +61,7 @@ public class Environment {
     }
 
     public int getPlace(Agent agent) {
-        for (int i = 0; i < nbPiles; i++) {
+        for (int i = 0; i < piles.size(); i++) {
             if (getPile(i).contains(agent)) {
                 return i;
             }
@@ -85,18 +82,18 @@ public class Environment {
     }
 
     public void printEnvironment() {
-        for (int i = nbPiles-1; i >= 0; i--) {
+        for (int i = piles.size()-1; i >= 0; i--) {
             Stack<Agent> pile = piles.get(i);
             StringBuilder string = new StringBuilder();
             for (Agent agent : pile) {
                 string.append(agent.getName()).append(" ");
             }
             if (!string.toString().equals("")) {
-                int nb = 2 * getNbAgents() - string.length();
+                int nb = 2 * getnbAgentss() - string.length();
                 string.append(" ".repeat(Math.max(0, nb)));
                 System.out.println("[ " + string + "]");
             } else {
-                string.append(" ".repeat(Math.max(0, 1 + 2 * getNbAgents())));
+                string.append(" ".repeat(Math.max(0, 1 + 2 * getnbAgentss())));
                 System.out.println("[" + string + "]");
             }
         }
@@ -107,17 +104,17 @@ public class Environment {
     }
 
     public int getNbPiles() {
-        return this.nbPiles;
+        return this.piles.size();
     }
 
-    public int getNbAgents() {
-        return this.nbAgent;
+    public int getnbAgentss() {
+        return this.nbAgents;
     }
 
 
 
 
-    public boolean getIsOneStackFree() {
+    public boolean isOneStackFree() {
         boolean isOneStackFree = false;
         for (Stack<Agent> pile : piles) {
             if (pile.size() == 0) {

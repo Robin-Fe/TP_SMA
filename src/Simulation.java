@@ -7,15 +7,13 @@ public class Simulation {
     private final Strategy strategy;
     private final Environment environment;
     public boolean verbose;
-    public final int nbPiles;
 
-    public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgents, int nbPiles) {
-        this.nbPiles = nbPiles;
+    public Simulation(boolean verbose, boolean randomOrdering, Strategy strategy, int nbAgentss, int nbPiles) {
         this.verbose = verbose;
         this.strategy = strategy;
         //TODO : A rendre modulaire
         Objet table = new Objet("Table", null);
-        Environment environment = new Environment(nbPiles, table, nbAgents, verbose);
+        Environment environment = new Environment(nbPiles, table, nbAgentss, verbose);
         Agent A = new Agent("A", table);
         Agent B = new Agent("B", A);
         Agent C = new Agent("C", B);
@@ -27,7 +25,7 @@ public class Simulation {
         Agent I = new Agent("I", H);
         Agent J = new Agent("J", I);
         List<Agent> agents = Arrays.asList(A, B, C, D, E, F, G, H, I, J);
-        agents = agents.subList(0, nbAgents);
+        agents = agents.subList(0, nbAgentss);
         if (randomOrdering) {
             int r1 = new Random().nextInt(agents.size());
             for (int i = 0; i < agents.size(); i++) {

@@ -4,7 +4,7 @@ public class CommunicateStrategy implements Strategy {
     private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
     private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
     private Mapping map = new Mapping();
-    Map<Agent, Objet> destinationAgents = new HashMap<Agent, Objet>();
+    private Map<Agent, Objet> destinationAgents = new HashMap<Agent, Objet>();
 
     @Override
     public void beforePerception(List<Agent> agents, Environment environment) {

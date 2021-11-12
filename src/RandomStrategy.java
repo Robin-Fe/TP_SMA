@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class NormalStrategy implements Strategy {
+public class RandomStrategy implements Strategy {
 
     @Override
     public void beforePerception(List<Agent> agents, Environment environment) {
@@ -35,7 +35,7 @@ public class NormalStrategy implements Strategy {
         }
     }
 
-    private void tryToMove(Agent agent, Environment environment) {
+    public void tryToMove(Agent agent, Environment environment) {
         if (agent.getFree()) {
             int index = new Random().nextInt(environment.getNbPiles());
             if (environment.verbose) {

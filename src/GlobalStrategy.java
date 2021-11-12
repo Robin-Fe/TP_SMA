@@ -3,7 +3,7 @@ import java.util.*;
 public class GlobalStrategy implements Strategy {
     private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
     private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
-    Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
+    private Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
 
     public GlobalStrategy() {
     }
@@ -184,7 +184,7 @@ public class GlobalStrategy implements Strategy {
 
     public void firstAgentAction(Agent agent, Environment environment) {
         if (agent.getFree()) {
-            if (environment.getIsOneStackFree()) {
+            if (environment.isOneStackFree()) {
                 if (environment.verbose) {
                     System.out.println(agent.getName() + " bouge vers " + environment.getStackFree());
                 }
