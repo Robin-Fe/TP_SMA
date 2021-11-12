@@ -11,13 +11,7 @@ public class Agent extends Objet {
         strategy.perception(this, environment);
     }
 
-
     public void action(Strategy strategy, Environment environment) {
         strategy.action(this, environment);
     }
-
-    public void setPush(boolean isPushed) {
-        this.setPushed(isPushed);
-    }
-
 }

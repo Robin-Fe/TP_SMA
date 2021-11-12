@@ -30,7 +30,7 @@ public class Environment {
 
     public void seDeplacer(Agent agent, int indexPileArrivee) {
         if (indexPileArrivee != getPlace(agent)) {
-            agent.setPush(false);
+            agent.setPushed(false);
         }
         Stack<Agent> pileArrivee = getPile(indexPileArrivee);
         Stack<Agent> pileDepart = getPile(getPlace(agent));
@@ -81,7 +81,7 @@ public class Environment {
 
     public void push(Agent agent) {
         if (getNextAgent(agent) != null)
-            getNextAgent(agent).setPush(true);
+            getNextAgent(agent).setPushed(true);
     }
 
     public void printEnvironment() {

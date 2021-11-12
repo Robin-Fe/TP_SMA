@@ -1,11 +1,12 @@
 import java.util.List;
 
-public abstract class Strategy {
-    public void beforePerception(List<Agent> agents, Environment environment, int nbPiles) {}
+public interface Strategy {
+    void beforePerception(List<Agent> agents, Environment environment);
 
-    public abstract void perception(Agent agent, Environment environment);
+    Agent getActionAgent(List<Agent> agents, Environment environment);
 
-    public abstract void action(Agent agent, Environment environment);
+    void perception(Agent agent, Environment environment);
 
-    public abstract Agent getActionAgent(List<Agent> agents, Environment environment);
+    void action(Agent agent, Environment environment);
+
 }

@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class GlobalStrategy extends Strategy {
+public class GlobalStrategy implements Strategy {
     private Stack<Agent> claimers = new Stack<>(); // Stack which shows who is gonna move
     private Stack<Agent> sleepers = new Stack<>(); // Stack which shows who is never gonna move
     Map<Agent, Integer> destinationIndexes = new HashMap<Agent, Integer>();
@@ -22,6 +22,10 @@ public class GlobalStrategy extends Strategy {
                 this.sleep(agent);
             }
         }
+    }
+
+    @Override
+    public void beforePerception(List<Agent> agents, Environment environment) {
     }
 
     @Override

@@ -55,7 +55,7 @@ public class Simulation {
                 System.out.println("\n");
                 environment.printEnvironment();
             }
-            strategy.beforePerception(agents, environment, nbPiles);
+            strategy.beforePerception(agents, environment);
             allAgentPerception(strategy, environment);
             strategy.getActionAgent(agents, environment).action(strategy, environment);
             allAgentPerception(strategy, environment);
