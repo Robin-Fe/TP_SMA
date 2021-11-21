@@ -2,7 +2,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-public class SmartDestinationPolitique implements Politique{
+// ----------------------------
+// |  MAY BE USED LATER ...   |
+// ----------------------------
+
+public class SmartDestinationPolitique implements Politique {
 
     int percent1;
     int percent2;
@@ -24,7 +28,6 @@ public class SmartDestinationPolitique implements Politique{
                 bestPile = pile;
             }
         }
-        new Random().nextInt(100);
         if (new Random().nextInt(100)<percent2) {
             return bestPile;
         }

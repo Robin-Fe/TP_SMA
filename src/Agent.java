@@ -1,51 +1,110 @@
-import java.util.Collections;
+import java.util.Random;
 
 public class Agent extends Objet {
 
-    public Politique AgentDestination;
+    private Objet heldObject;
+    private boolean hasObject;
 
-    public Agent(String name, Objet goal, Politique AgentDestination) {
-        super(name, goal);
-        this.AgentDestination = AgentDestination;
+    public Agent(String name) {
+        super(name);
     }
 
     public void perception(Environnement environment) {
-        Objet underAgent = environment.getPreviousAgent(this);
-        this.setFree(environment.getIsFree(this));
-        this.setGoalAchieved(underAgent == this.getGoal());
+        //TODO : Implement Agent perception
     }
 
     public void action(Environnement environment) {
-        if (!getGoalAchieved() || getPushed()) {
-            tryToMove(environment);
+        //TODO : Implement Agent action
+
+        //PICK OBJECT
+        if (!this.getHasObject() && !environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
+            int pickProb = 50;
+            if (pickProb < new Random().nextInt(100)) {
+                setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
+                setHasObject(true);
+            }
+        }
+
+        //DROP OBJECT
+        if (this.getHasObject() && environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
+            int dropProb = 50;
+            if (dropProb < new Random().nextInt(100)) {
+                environment.dropObject(environment.findAgent(this)[0], environment.findAgent(this)[1], getHeldObject());
+                setHeldObject(null);
+                setHasObject(false);
+            }
+        }
+
+        //MOVE
+        int xMove = new Random().nextInt(2);
+        int yMove = new Random().nextInt(2);
+        while (xMove + yMove < 1) {
+            xMove = new Random().nextInt(2);
+            yMove = new Random().nextInt(2);
+        }
+        int xDirection = new Random().nextInt(2);
+        int yDirection = new Random().nextInt(2);
+
+        if (xDirection == 0) {
+            if (environment.findAgent(this)[0] - xMove < 0) {
+                System.out.println("ALED X-");
+                return;
+            }
+            if (yDirection == 0) {
+                if (environment.findAgent(this)[1] - yMove < 0) {
+                    System.out.println("ALED Y-");
+                    return;
+                }
+                if (environment.isFreeOfAgent(environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] - yMove)) {
+                    environment.moveAgent(this, environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] - yMove);
+                }
+            } else {
+                if (environment.findAgent(this)[1] + yMove >= environment.getLargeMap()) {
+                    System.out.println("ALED Y+");
+                    return;
+                }
+                if (environment.isFreeOfAgent(environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] + yMove)) {
+                    environment.moveAgent(this, environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] + yMove);
+                }
+            }
         } else {
-            if (environment.verbose) {
-                System.out.println(this.getName() + " ne fait rien");
+            if (environment.findAgent(this)[0] + xMove >= environment.getLongMap()) {
+                System.out.println("OSKOUR X+");
+                return;
+            }
+            if (yDirection == 0) {
+                if (environment.findAgent(this)[1] - yMove < 0) {
+                    System.out.println("OSKOUR Y-");
+                    return;
+                }
+                if (environment.isFreeOfAgent(environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] - yMove)) {
+                    environment.moveAgent(this, environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] - yMove);
+                }
+            } else {
+                if (environment.findAgent(this)[1] + yMove >= environment.getLargeMap()) {
+                    System.out.println("OSKOUR Y+");
+                    return;
+                }
+                if (environment.isFreeOfAgent(environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] + yMove)) {
+                    environment.moveAgent(this, environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] + yMove);
+                }
             }
         }
     }
 
-    private void tryToMove(Environnement environment) {
-        if (getFree()) {
-            int startingIndex = environment.getPiles().lastIndexOf(environment.getPile(environment.getPlace(this)));
-            int index = startingIndex;
-            while (startingIndex == index) {
-                index = environment.getPiles().lastIndexOf(AgentDestination.getChoice(Collections.singletonList(environment.getPiles())));
-            }
-            if (environment.verbose) {
-                System.out.println(this.getName() + " bouge vers " + index);
-            }
-            environment.seDeplacer(this, index);
-        } else {
-            if (environment.verbose) {
-                System.out.println(this.getName() + " push");
-            }
-            environment.push(this);
-        }
+    public void setHeldObject(Objet object) {
+        this.heldObject = object;
     }
 
-    public void setPush(boolean isPushed) {
-        this.setPushed(isPushed);
+    public boolean getHasObject() {
+        return this.hasObject;
     }
 
+    public void setHasObject(boolean bool) {
+        this.hasObject = bool;
+    }
+
+    public Objet getHeldObject() {
+        return this.heldObject;
+    }
 }

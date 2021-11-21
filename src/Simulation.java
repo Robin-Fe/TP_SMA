@@ -1,88 +1,93 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.Observable;
 
-public class Simulation {
+public class Simulation extends Observable implements Runnable {
 
-    private final List<Agent> agents;
+    public Thread worker;
+    private final List<Agent> listeAgents;
     private final Environnement environnement;
     public boolean verbose;
-    public Politique AgentElection;
+    private int score;
+    private final int nbToursMax;
 
-    public Simulation(boolean verbose, boolean randomOrdering, int nbAgents, Politique AgentElection, Politique AgentDestination) {
-        this.AgentElection = AgentElection;
-        this.verbose = verbose;
-        Objet table = new Objet("Table", null);
-        Environnement environnement = new Environnement(3, table, nbAgents, verbose);
-        Agent A = new Agent("A", table, AgentDestination);
-        List<Agent> agents = new ArrayList<>();
-        agents.add(A);
-        for (int i = 1; i < nbAgents; i++) {
-            agents.add(new Agent(Character.toString((char) 65+i), agents.get(i-1), AgentDestination));
+    public Simulation(boolean verbose, int nbAgents, int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbToursMax) {
+        List<Agent> listeAgents = new ArrayList<>();
+        for (int i = 0; i < nbAgents; i++) {
+            listeAgents.add(new Agent(Character.toString((char) 65 + i)));
         }
+        Environnement environnement = new Environnement(tailleMapLong, tailleMapLarge, nbObjectsA, nbObjectsB, listeAgents, verbose);
 
-        if (randomOrdering) {
-            int r1 = new Random().nextInt(agents.size());
-            for (int i = 0; i < agents.size(); i++) {
-                while (environnement.getPlace(agents.get(r1)) != -100) {
-                    r1 = new Random().nextInt(agents.size());
-                }
-                int r2 = new Random().nextInt(environnement.getNbPiles());
-                environnement.addAgent(agents.get(r1), r2);
-            }
-        } else {
-            int i = 0;
-            for (Agent agent : agents) {
-                environnement.addAgent(agent, i);
-                i++;
-                if (i >= environnement.getNbPiles()) {
-                    i=0;
-                }
-            }
-        }
-        this.agents = agents;
+        this.listeAgents = listeAgents;
         this.environnement = environnement;
-        for (Agent agent : this.agents) {
-            agent.perception(this.environnement);
-        }
+        this.verbose = verbose;
+        this.score = 0;
+        this.nbToursMax = nbToursMax;
     }
 
     public int runSimulation() {
         int nbTours = 0;
-        while (!(testFinSimulation())) {
+        while (nbTours < 1000) {
+            getEnvironnement().printEnvironment();
             nbTours++;
-            if (verbose) {
-                System.out.println("\n");
-                environnement.printEnvironment();
+
+            for (Agent agent : this.listeAgents) {
+                agent.perception(this.environnement);
+                agent.action(environnement);
             }
-
-            allAgentsPerception();
-            Agent agentChoisi = (Agent) AgentElection.getChoice(Collections.singletonList(agents));
-            agentChoisi.action(environnement);
-            allAgentsPerception();
+            this.score = nbTours;
         }
-        if (verbose) {
-            System.out.println("\n");
-            environnement.printEnvironment();
-            System.out.println("\nNb Tours = " + nbTours);
-        }
-        return nbTours;
+        return score;
     }
 
-    public boolean testFinSimulation() {
-        for (Agent agent : agents) {
-            if (!agent.getGoalAchieved()) {
-                return false;
+    @Override
+    public void run() {
+        int nbTours = 0;
+        long tempspause = 30;
+        while (nbTours < 1000) {
+            getEnvironnement().printEnvironment();
+            nbTours++;
+
+            for (Agent agent : this.listeAgents) {
+                agent.perception(this.environnement);
+                agent.action(environnement);
+                setChanged();
+                notifyObservers();
+                try {
+                    Thread.sleep(tempspause);
+                } catch (InterruptedException ignored) {
+
+                }
+            }
+            this.score = nbTours;
+            setChanged();
+            notifyObservers();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+
             }
         }
-        return true;
     }
 
-    public void allAgentsPerception() {
-        for (Agent agent : this.agents) {
-            agent.perception(this.environnement);
-        }
+
+    public void interrupt() {
+        worker.interrupt();
+        setChanged();
+        notifyObservers();
     }
+
+    public void start() {
+        Thread worker = new Thread(this);
+        worker.start();
+        setChanged();
+        notifyObservers();
+    }
+
+    public int getScore() { return this.score; }
+
+    public int getNbToursMax() { return this.nbToursMax; }
+
+    public Environnement getEnvironnement() { return this.environnement; }
 
 }
