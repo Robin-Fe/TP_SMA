@@ -11,10 +11,10 @@ public class Simulation extends Observable implements Runnable {
     private int score;
     private final int nbToursMax;
 
-    public Simulation(boolean verbose, int nbAgents, int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbToursMax) {
+    public Simulation(boolean verbose, int nbAgents, int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbToursMax, double k1, double k2, int Tsize) {
         List<Agent> listeAgents = new ArrayList<>();
         for (int i = 0; i < nbAgents; i++) {
-            listeAgents.add(new Agent(Character.toString((char) 65 + i)));
+            listeAgents.add(new Agent(Character.toString((char) 65 + i), k1, k2, Tsize));
         }
         Environnement environnement = new Environnement(tailleMapLong, tailleMapLarge, nbObjectsA, nbObjectsB, listeAgents, verbose);
 
@@ -27,8 +27,9 @@ public class Simulation extends Observable implements Runnable {
 
     public int runSimulation() {
         int nbTours = 0;
-        while (nbTours < 1000) {
-            getEnvironnement().printEnvironment();
+        while (nbTours < nbToursMax) {
+            if (verbose)
+                getEnvironnement().printEnvironment();
             nbTours++;
 
             for (Agent agent : this.listeAgents) {
@@ -43,9 +44,10 @@ public class Simulation extends Observable implements Runnable {
     @Override
     public void run() {
         int nbTours = 0;
-        long tempspause = 30;
-        while (nbTours < 1000) {
-            getEnvironnement().printEnvironment();
+        long tempspause = 1;
+        while (nbTours < nbToursMax) {
+            if (verbose)
+                getEnvironnement().printEnvironment();
             nbTours++;
 
             for (Agent agent : this.listeAgents) {
@@ -63,7 +65,7 @@ public class Simulation extends Observable implements Runnable {
             setChanged();
             notifyObservers();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException ignored) {
 
             }
@@ -90,4 +92,5 @@ public class Simulation extends Observable implements Runnable {
 
     public Environnement getEnvironnement() { return this.environnement; }
 
+    public List<Agent> getListeAgents() { return listeAgents; }
 }
