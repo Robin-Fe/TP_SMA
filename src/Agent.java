@@ -11,13 +11,15 @@ public class Agent extends Objet {
     private final int Tsize;
     private double fA;
     private double fB;
+    private double e;
     private Queue<Class> lastVisited;
 
-    public Agent(String name, double k1, double k2, int Tsize) {
+    public Agent(String name, double k1, double k2, int Tsize, double e) {
         super(name);
         this.lastVisited = new LinkedList<>();
         this.k1 = k1;
         this.k2 = k2;
+        this.e = e;
         this.Tsize = Tsize;
     }
 
@@ -37,11 +39,11 @@ public class Agent extends Objet {
                 nbA++;
             }
             if (lastVisited.toArray()[i] == ObjetB.class) {
-                nbB ++;
+                nbB++;
             }
         }
-        fA = (double) nbA / Tsize;
-        fB = (double) nbB / Tsize;
+        fA = (double) nbA / Tsize + nbB * e;
+        fB = (double) nbB / Tsize + nbA * e;
     }
 
     public void action(Environnement environment) {
@@ -49,16 +51,17 @@ public class Agent extends Objet {
         if (!this.getHasObject() && !environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
             double pickProb = 0;
             if (environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]) instanceof ObjetA) {
-                pickProb = Math.pow((k1 + (k1 + fA)), 2);
+                pickProb = Math.pow((k1 / (k1 + fA)), 2);
             }
-            if (environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]) instanceof ObjetA) {
-                pickProb = Math.pow((k1 + (k1 + fB)), 2);
+            if (environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]) instanceof ObjetB) {
+                pickProb = Math.pow((k1 / (k1 + fB)), 2);
             }
             if (pickProb >= new Random().nextDouble()) {
                 setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
                 setHasObject(true);
             }
         }
+        perception(environment);
 
         //DROP OBJECT
         if (this.getHasObject() && environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
@@ -69,12 +72,13 @@ public class Agent extends Objet {
             if (this.getHeldObject() instanceof ObjetB) {
                 dropProb = Math.pow((fB / (k2 + fB)), 2);
             }
-            if (dropProb >= new Random().nextInt(100)) {
+            if (dropProb >= new Random().nextDouble()) {
                 environment.dropObject(environment.findAgent(this)[0], environment.findAgent(this)[1], getHeldObject());
                 setHeldObject(null);
                 setHasObject(false);
             }
         }
+        perception(environment);
 
         //MOVE
         int xMove = new Random().nextInt(2);
@@ -143,9 +147,19 @@ public class Agent extends Objet {
         return this.heldObject;
     }
 
-    public double getK1() { return k1; }
+    public double getK1() {
+        return k1;
+    }
 
-    public double getK2() { return k1; }
+    public double getK2() {
+        return k1;
+    }
 
-    public int getTsize() { return Tsize; }
+    public int getTsize() {
+        return Tsize;
+    }
+
+    public double getE() {
+        return e;
+    }
 }
