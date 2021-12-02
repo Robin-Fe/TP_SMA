@@ -35,13 +35,15 @@ public class Simulation extends Observable implements Runnable {
 
     public int runSimulation() {
         int nbTours = 0;
+        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTasA());
+        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTasB());
         while (nbTours < nbToursMax) {
             if (verbose) {
-                getEnvironnement().printEnvironment();
+                //getEnvironnement().printEnvironment();
             } else {
                 if (nbTours % 100000 == 0) {
                     System.out.println("Tour " + nbTours);
-                    getEnvironnement().printEnvironment();
+                    //getEnvironnement().printEnvironment();
                 }
             }
             nbTours++;
@@ -52,6 +54,8 @@ public class Simulation extends Observable implements Runnable {
             }
             this.score = nbTours;
         }
+        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTasA());
+        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTasB());
         return score;
     }
 
