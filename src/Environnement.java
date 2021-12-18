@@ -228,33 +228,63 @@ public class Environnement extends Observable {
         boolean down = false;
         boolean left = false;
         boolean right = false;
+        boolean upLeft = false;
+        boolean upRight = false;
+        boolean downLeft = false;
+        boolean downRight = false;
         if (objet instanceof ObjetA) {
             if (y + 1 < map[0].length)
                 up = map[x][y + 1][1] instanceof ObjetA;
             if (y - 1 >= 0)
                 down = map[x][y - 1][1] instanceof ObjetA;
-            if (x + 1 < map.length)
-                right = map[x + 1][y][1] instanceof ObjetA;
             if (x - 1 >= 0)
                 left = map[x - 1][y][1] instanceof ObjetA;
-        } else if (objet instanceof ObjetB) {
+            if (x + 1 < map.length)
+                right = map[x + 1][y][1] instanceof ObjetA;
+            if (x - 1 >= 0 && y + 1 < map[0].length)
+                upLeft = map[x - 1][y + 1][1] instanceof ObjetA;
+            if (x + 1 < map.length && y + 1 < map[0].length)
+                upRight = map[x + 1][y + 1][1] instanceof ObjetA;
+            if (x - 1 >= 0 && y - 1 >= 0)
+                downLeft = map[x - 1][y - 1][1] instanceof ObjetA;
+            if (x + 1 < map.length && y - 1 >= 0)
+                downRight = map[x + 1][y - 1][1] instanceof ObjetA;
+        }
+        if (objet instanceof ObjetB) {
             if (y + 1 < map[0].length)
                 up = map[x][y + 1][1] instanceof ObjetB;
             if (y - 1 >= 0)
                 down = map[x][y - 1][1] instanceof ObjetB;
-            if (x + 1 < map.length)
-                right = map[x + 1][y][1] instanceof ObjetB;
             if (x - 1 >= 0)
                 left = map[x - 1][y][1] instanceof ObjetB;
-        } else if (objet instanceof ObjetC) {
+            if (x + 1 < map.length)
+                right = map[x + 1][y][1] instanceof ObjetB;
+            if (x - 1 >= 0 && y + 1 < map[0].length)
+                upLeft = map[x - 1][y + 1][1] instanceof ObjetB;
+            if (x + 1 < map.length && y + 1 < map[0].length)
+                upRight = map[x + 1][y + 1][1] instanceof ObjetB;
+            if (x - 1 >= 0 && y - 1 >= 0)
+                downLeft = map[x - 1][y - 1][1] instanceof ObjetB;
+            if (x + 1 < map.length && y - 1 >= 0)
+                downRight = map[x + 1][y - 1][1] instanceof ObjetB;
+        }
+        if (objet instanceof ObjetC) {
             if (y + 1 < map[0].length)
                 up = map[x][y + 1][1] instanceof ObjetC;
             if (y - 1 >= 0)
                 down = map[x][y - 1][1] instanceof ObjetC;
-            if (x + 1 < map.length)
-                right = map[x + 1][y][1] instanceof ObjetC;
             if (x - 1 >= 0)
                 left = map[x - 1][y][1] instanceof ObjetC;
+            if (x + 1 < map.length)
+                right = map[x + 1][y][1] instanceof ObjetC;
+            if (x - 1 >= 0 && y + 1 < map[0].length)
+                upLeft = map[x - 1][y + 1][1] instanceof ObjetC;
+            if (x + 1 < map.length && y + 1 < map[0].length)
+                upRight = map[x + 1][y + 1][1] instanceof ObjetC;
+            if (x - 1 >= 0 && y - 1 >= 0)
+                downLeft = map[x - 1][y - 1][1] instanceof ObjetC;
+            if (x + 1 < map.length && y - 1 >= 0)
+                downRight = map[x + 1][y - 1][1] instanceof ObjetC;
         }
         if (up)
             freeDirections.add(new Coordinate(x, y + 1));
@@ -264,6 +294,14 @@ public class Environnement extends Observable {
             freeDirections.add(new Coordinate(x - 1, y));
         if (right)
             freeDirections.add(new Coordinate(x + 1, y));
+        if (upRight)
+            freeDirections.add(new Coordinate(x+1, y+1));
+        if (upLeft)
+            freeDirections.add(new Coordinate(x-1, y+1));
+        if (downRight)
+            freeDirections.add(new Coordinate(x+1, y-1));
+        if (downLeft)
+            freeDirections.add(new Coordinate(x-1, y-1));
         return freeDirections;
     }
 
