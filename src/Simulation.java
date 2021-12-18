@@ -11,12 +11,12 @@ public class Simulation extends Observable implements Runnable {
     private int score;
     private final int nbToursMax;
 
-    public Simulation(boolean verbose, int nbAgents, int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbToursMax, double k1, double k2, int Tsize, double e) {
+    public Simulation(boolean verbose, int nbAgents, int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbObjectsC, int nbToursMax, double k1, double k2, int Tsize, double e) {
         List<Agent> listeAgents = new ArrayList<>();
         for (int i = 0; i < nbAgents; i++) {
             listeAgents.add(new Agent(Character.toString((char) 65 + i), k1, k2, Tsize, e));
         }
-        Environnement environnement = new Environnement(tailleMapLong, tailleMapLarge, nbObjectsA, nbObjectsB, listeAgents, verbose);
+        Environnement environnement = new Environnement(tailleMapLong, tailleMapLarge, nbObjectsA, nbObjectsB, nbObjectsC, listeAgents, verbose);
 
         this.listeAgents = listeAgents;
         this.environnement = environnement;
@@ -35,15 +35,19 @@ public class Simulation extends Observable implements Runnable {
 
     public int runSimulation() {
         int nbTours = 0;
-        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTasA());
-        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTasB());
+        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
+        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
+        System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
         while (nbTours < nbToursMax) {
             if (verbose) {
-                //getEnvironnement().printEnvironment();
+                getEnvironnement().printEnvironment();
             } else {
                 if (nbTours % 100000 == 0) {
                     System.out.println("Tour " + nbTours);
                     //getEnvironnement().printEnvironment();
+                    System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
+                    System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
+                    System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
                 }
             }
             nbTours++;
@@ -54,8 +58,9 @@ public class Simulation extends Observable implements Runnable {
             }
             this.score = nbTours;
         }
-        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTasA());
-        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTasB());
+        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
+        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
+        System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
         return score;
     }
 

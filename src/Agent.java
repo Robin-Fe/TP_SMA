@@ -1,17 +1,18 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 public class Agent extends Objet {
 
     private Objet heldObject;
     private boolean hasObject;
+    private boolean isHelping;
+    private Agent helperAgent;
     private final double k1;
     private final double k2;
     private final int Tsize;
     private double fA;
     private double fB;
-    private double e;
+    private double fC;
+    private final double e;
     private Queue<Class> lastVisited;
 
     public Agent(String name, double k1, double k2, int Tsize, double e) {
@@ -21,6 +22,8 @@ public class Agent extends Objet {
         this.k2 = k2;
         this.e = e;
         this.Tsize = Tsize;
+        this.isHelping = false;
+        this.helperAgent = null;
     }
 
     public void perception(Environnement environment) {
@@ -34,6 +37,7 @@ public class Agent extends Objet {
         }
         int nbA = 0;
         int nbB = 0;
+        int nbC = 0;
         for (int i = 0; i < lastVisited.size(); i++) {
             if (lastVisited.toArray()[i] == ObjetA.class) {
                 nbA++;
@@ -41,24 +45,49 @@ public class Agent extends Objet {
             if (lastVisited.toArray()[i] == ObjetB.class) {
                 nbB++;
             }
+            if (lastVisited.toArray()[i] == ObjetC.class) {
+                nbC++;
+            }
         }
-        fA = (double) nbA / Tsize + nbB * e;
-        fB = (double) nbB / Tsize + nbA * e;
+        fA = (double) nbA / Tsize + (nbB+nbC) * e;
+        fB = (double) nbB / Tsize + (nbA+nbC) * e;
+        fC = (double) nbC / Tsize + (nbA+nbB) * e;
     }
 
     public void action(Environnement environment) {
+
+        if (isHelping) {
+            return;
+        }
         //PICK OBJECT
         if (!this.getHasObject() && !environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
             double pickProb = 0;
-            if (environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]) instanceof ObjetA) {
+            Objet objectHere = environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]);
+            if (objectHere instanceof ObjetA) {
                 pickProb = Math.pow((k1 / (k1 + fA)), 2);
             }
-            if (environment.getObject(environment.findAgent(this)[0], environment.findAgent(this)[1]) instanceof ObjetB) {
+            if (objectHere instanceof ObjetB) {
                 pickProb = Math.pow((k1 / (k1 + fB)), 2);
             }
+            if (objectHere instanceof ObjetC) {
+                pickProb = Math.pow((k1 / (k1 + fC)), 2);
+            }
             if (pickProb >= new Random().nextDouble()) {
-                setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
-                setHasObject(true);
+                if (objectHere instanceof ObjetC) {
+                    List<Agent> listAgents = environment.getListeAgents();
+                    Collections.shuffle(listAgents);
+                    for (Agent agent : listAgents) {
+                        if (agent != this && !agent.isHelping && !agent.getHasObject()) {
+                            setHelperAgent(agent, environment);
+                            setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
+                            setHasObject(true);
+                            break;
+                        }
+                    }
+                } else {
+                    setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
+                    setHasObject(true);
+                }
             }
         }
         perception(environment);
@@ -72,10 +101,17 @@ public class Agent extends Objet {
             if (this.getHeldObject() instanceof ObjetB) {
                 dropProb = Math.pow((fB / (k2 + fB)), 2);
             }
+            if (this.getHeldObject() instanceof ObjetC) {
+                dropProb = Math.pow((fC / (k2 + fC)), 2);
+            }
             if (dropProb >= new Random().nextDouble()) {
                 environment.dropObject(environment.findAgent(this)[0], environment.findAgent(this)[1], getHeldObject());
                 setHeldObject(null);
                 setHasObject(false);
+                if (helperAgent != null) {
+                    helperAgent.freeHelper(environment);
+                    helperAgent = null;
+                }
             }
         }
         perception(environment);
@@ -129,6 +165,9 @@ public class Agent extends Objet {
                 }
             }
         }
+        if (helperAgent != null) {
+            environment.moveHelper(helperAgent, environment.findAgent(this)[0], environment.findAgent(this)[1]);
+        }
     }
 
     public void setHeldObject(Objet object) {
@@ -161,5 +200,27 @@ public class Agent extends Objet {
 
     public double getE() {
         return e;
+    }
+
+    public boolean getIsHelping() {
+        return isHelping;
+    }
+
+    public void freeHelper(Environnement environnement) {
+        isHelping = false;
+        environnement.switchHelper(this);
+    }
+
+    //TODO : AN AGENT HAS TO OFFER HELP, NOT TO FORCE OTHERS TO HELP HIM
+
+    public void helpAgent(Agent agent) {
+        //agent.setHelperAgent(this);
+        isHelping = true;
+    }
+
+    public void setHelperAgent(Agent agent, Environnement environnement) {
+        agent.helpAgent(this);
+        helperAgent = agent;
+        environnement.switchHelper(agent);
     }
 }
