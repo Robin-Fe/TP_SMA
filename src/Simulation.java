@@ -35,9 +35,6 @@ public class Simulation extends Observable implements Runnable {
 
     public int runSimulation() {
         int nbTours = 0;
-        System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
-        System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
-        System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
         while (nbTours < nbToursMax) {
             if (verbose) {
                 getEnvironnement().printEnvironment();
@@ -47,7 +44,7 @@ public class Simulation extends Observable implements Runnable {
                     //getEnvironnement().printEnvironment();
                     System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
                     System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
-                    System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
+                    System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")) + "\n");
                 }
             }
             nbTours++;
@@ -56,11 +53,12 @@ public class Simulation extends Observable implements Runnable {
                 agent.perception(this.environnement);
                 agent.action(environnement);
             }
+            environnement.updateMap();
             this.score = nbTours;
         }
         System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
         System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
-        System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")));
+        System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")) + "\n");
         return score;
     }
 
@@ -84,11 +82,12 @@ public class Simulation extends Observable implements Runnable {
 
                 }
             }
+            environnement.updateMap();
             this.score = nbTours;
             setChanged();
             notifyObservers();
             try {
-                Thread.sleep(50);
+                Thread.sleep(500);
             } catch (InterruptedException ignored) {
 
             }

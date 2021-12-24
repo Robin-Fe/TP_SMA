@@ -110,8 +110,10 @@ public class Environnement extends Observable {
             object = new ObjetA("");
         } else if (getObject(x, y) instanceof ObjetB){
             object = new ObjetB("");
-        } else {
+        } else if (getObject(x, y) instanceof ObjetC){
             object = new ObjetC("");
+        } else {
+            object = null;
         }
         map[x][y][1] = null;
         setChanged();
@@ -196,10 +198,10 @@ public class Environnement extends Observable {
                         nbTas = calculateNbTas(nbTas, seen, x, y, objet);
                     }
                 } else if (objetType instanceof ObjetC) {
-                if (objet instanceof ObjetC) {
-                    nbTas = calculateNbTas(nbTas, seen, x, y, objet);
+                    if (objet instanceof ObjetC) {
+                        nbTas = calculateNbTas(nbTas, seen, x, y, objet);
+                    }
                 }
-            }
             }
         }
         return nbTas;
@@ -303,6 +305,25 @@ public class Environnement extends Observable {
         if (downLeft)
             freeDirections.add(new Coordinate(x-1, y-1));
         return freeDirections;
+    }
+
+    public void updateMap() {
+        for (int x = 0; x < map.length; x++) {
+            for (int y = 0; y < map[x].length; y++) {
+                Agent agent = getAgent(x, y);
+                Agent helper = (Agent) map[x][y][2];
+                if (agent != null) {
+                    if (agentHashMap.get(agent)[0] != x || agentHashMap.get(agent)[1] != y) {
+                        map[x][y][0] = null;
+                    }
+                }
+                if (helper != null) {
+                    if (agentHashMap.get(helper)[0] != x || agentHashMap.get(helper)[1] != y) {
+                        map[x][y][2] = null;
+                    }
+                }
+            }
+        }
     }
 
     public List<Agent> getListeAgents() {

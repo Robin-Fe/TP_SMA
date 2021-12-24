@@ -1,10 +1,13 @@
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
 
 public class Agent extends Objet {
 
     private Objet heldObject;
     private boolean hasObject;
     private boolean isHelping;
+    private boolean waitingForHelp;
     private Agent helperAgent;
     private final double k1;
     private final double k2;
@@ -23,6 +26,7 @@ public class Agent extends Objet {
         this.e = e;
         this.Tsize = Tsize;
         this.isHelping = false;
+        this.waitingForHelp = false;
         this.helperAgent = null;
     }
 
@@ -52,9 +56,28 @@ public class Agent extends Objet {
         fA = (double) nbA / Tsize + (nbB+nbC) * e;
         fB = (double) nbB / Tsize + (nbA+nbC) * e;
         fC = (double) nbC / Tsize + (nbA+nbB) * e;
+
+        for (Agent agent : environment.getListeAgents()) {
+            if (agent != this) {
+                if (agent.waitingForHelp) {
+                    if (Math.abs(environment.findAgent(agent)[0] - environment.findAgent(this)[0]) <= 1 && Math.abs(environment.findAgent(agent)[1] - environment.findAgent(this)[1]) <= 1) {
+                        //System.out.println(environment.findAgent(agent)[0] + "" + environment.findAgent(this)[0] + "" + environment.findAgent(agent)[1] + "" + environment.findAgent(this)[1]);
+                        //System.out.println("Agent " + this + " helping agent " + agent);
+                        helpAgent(agent, environment);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public void action(Environnement environment) {
+        if (waitingForHelp) {
+            if (new Random().nextDouble() > 0.8) {
+                waitingForHelp = false;
+            }
+            return;
+        }
 
         if (isHelping) {
             return;
@@ -74,7 +97,9 @@ public class Agent extends Objet {
             }
             if (pickProb >= new Random().nextDouble()) {
                 if (objectHere instanceof ObjetC) {
-                    List<Agent> listAgents = environment.getListeAgents();
+                    waitingForHelp = true;
+                    return;
+                    /*List<Agent> listAgents = environment.getListeAgents();
                     Collections.shuffle(listAgents);
                     for (Agent agent : listAgents) {
                         if (agent != this && !agent.isHelping && !agent.getHasObject()) {
@@ -83,14 +108,13 @@ public class Agent extends Objet {
                             setHasObject(true);
                             break;
                         }
-                    }
+                    }*/
                 } else {
                     setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
                     setHasObject(true);
                 }
             }
         }
-        perception(environment);
 
         //DROP OBJECT
         if (this.getHasObject() && environment.isFreeOfObject(environment.findAgent(this)[0], environment.findAgent(this)[1])) {
@@ -98,11 +122,14 @@ public class Agent extends Objet {
             if (this.getHeldObject() instanceof ObjetA) {
                 dropProb = Math.pow((fA / (k2 + fA)), 2);
             }
-            if (this.getHeldObject() instanceof ObjetB) {
+            else if (this.getHeldObject() instanceof ObjetB) {
                 dropProb = Math.pow((fB / (k2 + fB)), 2);
             }
-            if (this.getHeldObject() instanceof ObjetC) {
+            else if (this.getHeldObject() instanceof ObjetC) {
                 dropProb = Math.pow((fC / (k2 + fC)), 2);
+            }
+            else {
+                dropProb = 1.0;
             }
             if (dropProb >= new Random().nextDouble()) {
                 environment.dropObject(environment.findAgent(this)[0], environment.findAgent(this)[1], getHeldObject());
@@ -114,7 +141,6 @@ public class Agent extends Objet {
                 }
             }
         }
-        perception(environment);
 
         //MOVE
         int xMove = new Random().nextInt(2);
@@ -211,15 +237,17 @@ public class Agent extends Objet {
         environnement.switchHelper(this);
     }
 
-    //TODO : AN AGENT HAS TO OFFER HELP, NOT TO FORCE OTHERS TO HELP HIM
-
-    public void helpAgent(Agent agent) {
-        //agent.setHelperAgent(this);
-        isHelping = true;
+    public void helpAgent(Agent agent, Environnement environnement) {
+        if (agent.waitingForHelp) {
+            agent.waitingForHelp = false;
+            agent.setHelperAgent(this, environnement);
+            agent.setHeldObject(environnement.pickObject(environnement.findAgent(agent)[0], environnement.findAgent(agent)[1]));
+            agent.setHasObject(true);
+            isHelping = true;
+        }
     }
 
     public void setHelperAgent(Agent agent, Environnement environnement) {
-        agent.helpAgent(this);
         helperAgent = agent;
         environnement.switchHelper(agent);
     }
