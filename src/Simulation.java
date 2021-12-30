@@ -54,6 +54,7 @@ public class Simulation extends Observable implements Runnable {
                 agent.action(environnement);
             }
             environnement.updateMap();
+            environnement.attenuatePheromones();
             this.score = nbTours;
         }
         System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
@@ -83,6 +84,7 @@ public class Simulation extends Observable implements Runnable {
                 }
             }
             environnement.updateMap();
+            environnement.attenuatePheromones();
             this.score = nbTours;
             setChanged();
             notifyObservers();

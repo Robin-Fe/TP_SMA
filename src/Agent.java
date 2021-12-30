@@ -1,6 +1,4 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 public class Agent extends Objet {
 
@@ -61,8 +59,6 @@ public class Agent extends Objet {
             if (agent != this) {
                 if (agent.waitingForHelp) {
                     if (Math.abs(environment.findAgent(agent)[0] - environment.findAgent(this)[0]) <= 1 && Math.abs(environment.findAgent(agent)[1] - environment.findAgent(this)[1]) <= 1) {
-                        //System.out.println(environment.findAgent(agent)[0] + "" + environment.findAgent(this)[0] + "" + environment.findAgent(agent)[1] + "" + environment.findAgent(this)[1]);
-                        //System.out.println("Agent " + this + " helping agent " + agent);
                         helpAgent(agent, environment);
                         break;
                     }
@@ -97,18 +93,9 @@ public class Agent extends Objet {
             }
             if (pickProb >= new Random().nextDouble()) {
                 if (objectHere instanceof ObjetC) {
+                    environment.addPheromones(environment.findAgent(this)[0], environment.findAgent(this)[1]);
                     waitingForHelp = true;
                     return;
-                    /*List<Agent> listAgents = environment.getListeAgents();
-                    Collections.shuffle(listAgents);
-                    for (Agent agent : listAgents) {
-                        if (agent != this && !agent.isHelping && !agent.getHasObject()) {
-                            setHelperAgent(agent, environment);
-                            setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
-                            setHasObject(true);
-                            break;
-                        }
-                    }*/
                 } else {
                     setHeldObject(environment.pickObject(environment.findAgent(this)[0], environment.findAgent(this)[1]));
                     setHasObject(true);
@@ -143,54 +130,43 @@ public class Agent extends Objet {
         }
 
         //MOVE
-        int xMove = new Random().nextInt(2);
-        int yMove = new Random().nextInt(2);
-        while (xMove + yMove < 1) {
-            xMove = new Random().nextInt(2);
-            yMove = new Random().nextInt(2);
-        }
-        int xDirection = new Random().nextInt(2);
-        int yDirection = new Random().nextInt(2);
-
-        if (xDirection == 0) {
-            if (environment.findAgent(this)[0] - xMove < 0) {
-                return;
+        HashMap<Coordinate, Double> freeDirections = environment.getFreeDirections(environment.findAgent(this)[0], environment.findAgent(this)[1]);
+        Coordinate bestCoordinate;
+        if (!hasObject) {
+            Double maxPheromone = -1.0;
+            List<Coordinate> bestCoordinates = new ArrayList<>();
+            for (Map.Entry<Coordinate, Double> entry : freeDirections.entrySet()) {
+                Coordinate coordinate = entry.getKey();
+                Double pheromone = entry.getValue();
+                if (pheromone > maxPheromone) {
+                    maxPheromone = pheromone;
+                    bestCoordinates = new ArrayList<>();
+                    bestCoordinates.add(coordinate);
+                }
+                if (pheromone.equals(maxPheromone)) {
+                    bestCoordinates.add(coordinate);
+                }
             }
-            if (yDirection == 0) {
-                if (environment.findAgent(this)[1] - yMove < 0) {
-                    return;
-                }
-                if (environment.isFreeOfAgent(environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] - yMove)) {
-                    environment.moveAgent(this, environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] - yMove);
-                }
+            if (new Random().nextDouble() > 0.8 && bestCoordinates.size() > 0) {
+                bestCoordinate = bestCoordinates.get(new Random().nextInt(bestCoordinates.size()));
             } else {
-                if (environment.findAgent(this)[1] + yMove >= environment.getLargeMap()) {
-                    return;
-                }
-                if (environment.isFreeOfAgent(environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] + yMove)) {
-                    environment.moveAgent(this, environment.findAgent(this)[0] - xMove, environment.findAgent(this)[1] + yMove);
+                if (freeDirections.keySet().size() > 0) {
+                    bestCoordinate = (Coordinate) freeDirections.keySet().toArray()[new Random().nextInt(freeDirections.keySet().size())];
+                } else {
+                    bestCoordinate = new Coordinate(environment.findAgent(this)[0], environment.findAgent(this)[1]);
                 }
             }
         } else {
-            if (environment.findAgent(this)[0] + xMove >= environment.getLongMap()) {
-                return;
-            }
-            if (yDirection == 0) {
-                if (environment.findAgent(this)[1] - yMove < 0) {
-                    return;
-                }
-                if (environment.isFreeOfAgent(environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] - yMove)) {
-                    environment.moveAgent(this, environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] - yMove);
-                }
+            if (freeDirections.keySet().size() > 0) {
+                bestCoordinate = (Coordinate) freeDirections.keySet().toArray()[new Random().nextInt(freeDirections.keySet().size())];
             } else {
-                if (environment.findAgent(this)[1] + yMove >= environment.getLargeMap()) {
-                    return;
-                }
-                if (environment.isFreeOfAgent(environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] + yMove)) {
-                    environment.moveAgent(this, environment.findAgent(this)[0] + xMove, environment.findAgent(this)[1] + yMove);
-                }
+                bestCoordinate = new Coordinate(environment.findAgent(this)[0], environment.findAgent(this)[1]);
             }
         }
+        if (environment.isFreeOfAgent(bestCoordinate.getX(), bestCoordinate.getY())) {
+            environment.moveAgent(this, bestCoordinate.getX(), bestCoordinate.getY());
+        }
+
         if (helperAgent != null) {
             environment.moveHelper(helperAgent, environment.findAgent(this)[0], environment.findAgent(this)[1]);
         }
@@ -232,23 +208,24 @@ public class Agent extends Objet {
         return isHelping;
     }
 
-    public void freeHelper(Environnement environnement) {
+    public void freeHelper(Environnement environment) {
         isHelping = false;
-        environnement.switchHelper(this);
+        environment.switchHelper(this);
     }
 
-    public void helpAgent(Agent agent, Environnement environnement) {
+    public void helpAgent(Agent agent, Environnement environment) {
         if (agent.waitingForHelp) {
             agent.waitingForHelp = false;
-            agent.setHelperAgent(this, environnement);
-            agent.setHeldObject(environnement.pickObject(environnement.findAgent(agent)[0], environnement.findAgent(agent)[1]));
+            agent.setHelperAgent(this, environment);
+            agent.setHeldObject(environment.pickObject(environment.findAgent(agent)[0], environment.findAgent(agent)[1]));
             agent.setHasObject(true);
+            environment.removePheromones(environment.findAgent(this)[0], environment.findAgent(this)[1]);
             isHelping = true;
         }
     }
 
-    public void setHelperAgent(Agent agent, Environnement environnement) {
+    public void setHelperAgent(Agent agent, Environnement environment) {
         helperAgent = agent;
-        environnement.switchHelper(agent);
+        environment.switchHelper(agent);
     }
 }

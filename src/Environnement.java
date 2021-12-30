@@ -3,6 +3,7 @@ import java.util.*;
 public class Environnement extends Observable {
     private final List<Agent> listeAgents;
     private Objet[][][] map;
+    private Double[][] mapPheromones;
     private HashMap<Agent, int[]> agentHashMap;
     private final int nbObjectsA;
     private final int nbObjectsB;
@@ -11,6 +12,12 @@ public class Environnement extends Observable {
 
     public Environnement(int tailleMapLong, int tailleMapLarge, int nbObjectsA, int nbObjectsB, int nbObjectsC, List<Agent> listeAgents, boolean verbose) {
         this.map = new Objet[tailleMapLong][tailleMapLarge][3];
+        this.mapPheromones = new Double[tailleMapLong][tailleMapLarge];
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                mapPheromones[i][j] = 0.0;
+            }
+        }
         HashMap<Agent, int[]> agentHashMap = new HashMap<>();
         int r1 = new Random().nextInt(tailleMapLong);
         int r2 = new Random().nextInt(tailleMapLarge);
@@ -183,6 +190,10 @@ public class Environnement extends Observable {
         return this.nbObjectsC;
     }
 
+    public Double[][] getMapPheromones() {
+        return this.mapPheromones;
+    }
+
     public int getNbTas(Objet objetType) {
         int nbTas = 0;
         List<Objet> seen = new ArrayList<>();
@@ -328,5 +339,131 @@ public class Environnement extends Observable {
 
     public List<Agent> getListeAgents() {
         return listeAgents;
+    }
+
+    public HashMap<Coordinate, Double> getFreeDirections(int x, int y) {
+        HashMap<Coordinate, Double> freeDirections = new HashMap<>();
+        boolean up = false;
+        boolean down = false;
+        boolean left = false;
+        boolean right = false;
+        boolean upLeft = false;
+        boolean upRight = false;
+        boolean downLeft = false;
+        boolean downRight = false;
+        if (y + 1 < map[0].length)
+            up = map[x][y + 1][0] == null;
+        if (y - 1 >= 0)
+            down = map[x][y - 1][0] == null;
+        if (x - 1 >= 0)
+            left = map[x - 1][y][0] == null;
+        if (x + 1 < map.length)
+            right = map[x + 1][y][0] == null;
+        if (x - 1 >= 0 && y + 1 < map[0].length)
+            upLeft = map[x - 1][y + 1][0] == null;
+        if (x + 1 < map.length && y + 1 < map[0].length)
+            upRight = map[x + 1][y + 1][0] == null;
+        if (x - 1 >= 0 && y - 1 >= 0)
+            downLeft = map[x - 1][y - 1][0] == null;
+        if (x + 1 < map.length && y - 1 >= 0)
+            downRight = map[x + 1][y - 1][0] == null;
+
+        if (up)
+            freeDirections.put(new Coordinate(x, y + 1), mapPheromones[x][y+1]);
+        if (down)
+            freeDirections.put(new Coordinate(x, y - 1), mapPheromones[x][y-1]);
+        if (left)
+            freeDirections.put(new Coordinate(x - 1, y), mapPheromones[x-1][y]);
+        if (right)
+            freeDirections.put(new Coordinate(x + 1, y), mapPheromones[x+1][y]);
+        if (upRight)
+            freeDirections.put(new Coordinate(x+1, y+1), mapPheromones[x+1][y+1]);
+        if (upLeft)
+            freeDirections.put(new Coordinate(x-1, y+1), mapPheromones[x-1][y+1]);
+        if (downRight)
+            freeDirections.put(new Coordinate(x+1, y-1), mapPheromones[x+1][y-1]);
+        if (downLeft)
+            freeDirections.put(new Coordinate(x-1, y-1), mapPheromones[x-1][y-1]);
+        return freeDirections;
+    }
+    
+    public void addPheromones(int x, int y) {
+        if (y + 1 < map[0].length)
+            mapPheromones[x][y + 1] += 0.5;
+        if (y - 1 >= 0)
+            mapPheromones[x][y - 1] += 0.5;
+        if (x - 1 >= 0)
+            mapPheromones[x - 1][y] += 0.5;
+        if (x + 1 < map.length)
+            mapPheromones[x + 1][y] += 0.5;
+        if (x - 1 >= 0 && y + 1 < map[0].length)
+            mapPheromones[x - 1][y + 1] += 0.3;
+        if (x + 1 < map.length && y + 1 < map[0].length)
+            mapPheromones[x + 1][y + 1] += 0.3;
+        if (x - 1 >= 0 && y - 1 >= 0)
+            mapPheromones[x - 1][y - 1] += 0.3;
+        if (x + 1 < map.length && y - 1 >= 0)
+            mapPheromones[x + 1][y - 1] += 0.3;
+        
+        if (y + 2 < map[0].length)
+            mapPheromones[x][y + 2] += 0.2;
+        if (y - 2 >= 0)
+            mapPheromones[x][y - 2] += 0.2;
+        if (x - 2 >= 0)
+            mapPheromones[x - 2][y] += 0.2;
+        if (x + 2 < map.length)
+            mapPheromones[x + 2][y] += 0.2;
+        if (x - 2 >= 0 && y + 2 < map[0].length)
+            mapPheromones[x - 2][y + 2] += 0.1;
+        if (x + 2 < map.length && y + 2 < map[0].length)
+            mapPheromones[x + 2][y + 2] += 0.1;
+        if (x - 2 >= 0 && y - 2 >= 0)
+            mapPheromones[x - 2][y - 2] += 0.1;
+        if (x + 2 < map.length && y - 2 >= 0)
+            mapPheromones[x + 2][y - 2] += 0.1;
+    }
+
+    public void removePheromones(int x, int y) {
+        if (y + 1 < map[0].length)
+            mapPheromones[x][y + 1] /= 100;
+        if (y - 1 >= 0)
+            mapPheromones[x][y - 1] /= 100;
+        if (x - 1 >= 0)
+            mapPheromones[x - 1][y] /= 100;
+        if (x + 1 < map.length)
+            mapPheromones[x + 1][y] /= 100;
+        if (x - 1 >= 0 && y + 1 < map[0].length)
+            mapPheromones[x - 1][y + 1] /= 100;
+        if (x + 1 < map.length && y + 1 < map[0].length)
+            mapPheromones[x + 1][y + 1] /= 100;
+        if (x - 1 >= 0 && y - 1 >= 0)
+            mapPheromones[x - 1][y - 1] /= 100;
+        if (x + 1 < map.length && y - 1 >= 0)
+            mapPheromones[x + 1][y - 1] /= 100;
+
+        if (y + 2 < map[0].length)
+            mapPheromones[x][y + 2] /= 100;
+        if (y - 2 >= 0)
+            mapPheromones[x][y - 2] /= 100;
+        if (x - 2 >= 0)
+            mapPheromones[x - 2][y] /= 100;
+        if (x + 2 < map.length)
+            mapPheromones[x + 2][y] /= 100;
+        if (x - 2 >= 0 && y + 2 < map[0].length)
+            mapPheromones[x - 2][y + 2] /= 100;
+        if (x + 2 < map.length && y + 2 < map[0].length)
+            mapPheromones[x + 2][y + 2] /= 100;
+        if (x - 2 >= 0 && y - 2 >= 0)
+            mapPheromones[x - 2][y - 2] /= 100;
+        if (x + 2 < map.length && y - 2 >= 0)
+            mapPheromones[x + 2][y - 2] /= 100;
+    }
+
+    public void attenuatePheromones() {
+        for (int x = 0; x < map.length; x++) {
+            for (int y = 0; y < map[x].length; y++) {
+                mapPheromones[x][y] /= 2;
+            }
+        }
     }
 }
