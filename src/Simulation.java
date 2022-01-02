@@ -42,9 +42,14 @@ public class Simulation extends Observable implements Runnable {
                 if (nbTours % 100000 == 0) {
                     System.out.println("Tour " + nbTours);
                     //getEnvironnement().printEnvironment();
+                    getEnvironnement().printPheromones();
                     System.out.println("Nombre de tas A : " + getEnvironnement().getNbTas(new ObjetA("")));
                     System.out.println("Nombre de tas B : " + getEnvironnement().getNbTas(new ObjetB("")));
                     System.out.println("Nombre de tas C : " + getEnvironnement().getNbTas(new ObjetC("")) + "\n");
+                }
+                if (nbTours % 100000 == 1) {
+                    System.out.println("Tour " + nbTours);
+                    getEnvironnement().printPheromones();
                 }
             }
             nbTours++;

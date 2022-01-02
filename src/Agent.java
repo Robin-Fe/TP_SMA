@@ -130,20 +130,20 @@ public class Agent extends Objet {
         }
 
         //MOVE
-        HashMap<Coordinate, Double> freeDirections = environment.getFreeDirections(environment.findAgent(this)[0], environment.findAgent(this)[1]);
+        HashMap<Coordinate, Integer> freeDirections = environment.getFreeDirections(environment.findAgent(this)[0], environment.findAgent(this)[1]);
         Coordinate bestCoordinate;
         if (!hasObject) {
-            Double maxPheromone = -1.0;
+            int maxPheromone = -1;
             List<Coordinate> bestCoordinates = new ArrayList<>();
-            for (Map.Entry<Coordinate, Double> entry : freeDirections.entrySet()) {
+            for (Map.Entry<Coordinate, Integer> entry : freeDirections.entrySet()) {
                 Coordinate coordinate = entry.getKey();
-                Double pheromone = entry.getValue();
+                int pheromone = entry.getValue();
                 if (pheromone > maxPheromone) {
                     maxPheromone = pheromone;
                     bestCoordinates = new ArrayList<>();
                     bestCoordinates.add(coordinate);
                 }
-                if (pheromone.equals(maxPheromone)) {
+                if (pheromone == maxPheromone) {
                     bestCoordinates.add(coordinate);
                 }
             }
